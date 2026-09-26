@@ -32,7 +32,7 @@ def on_startup():
 # CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*", "https://jewelry-pos.onrender.com", "https://jewelry-pos-tau.vercel.app"],
+    allow_origins=["*", "https://jewelry-pos-sfji.onrender.com", "https://jewelry-pos-six.vercel.app", "https://jewelry-pos-tau.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
