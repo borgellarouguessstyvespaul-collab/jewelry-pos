@@ -10,6 +10,8 @@ from sqlalchemy.orm import sessionmaker
 from app.core.config import settings
 
 db_url = settings.DATABASE_URL
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
 
 # Support SQLite or automatic fallback if postgres is not available
 if db_url.startswith("sqlite"):
@@ -19,12 +21,13 @@ if db_url.startswith("sqlite"):
     )
 else:
     try:
-        # Test connection to PostgreSQL with small timeout
+        # Test connection to PostgreSQL / Neon with small timeout
         test_engine = create_engine(db_url, pool_pre_ping=True, pool_size=5, max_overflow=10)
         with test_engine.connect() as conn:
             pass
         engine = test_engine
-    except Exception:
+    except Exception as err:
+        print(f"PostgreSQL connection error ({err}), falling back to SQLite")
         db_url = "sqlite:///./jewelry_pos.db"
         engine = create_engine(
             db_url,

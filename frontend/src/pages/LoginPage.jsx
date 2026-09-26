@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('admin@jewelrypos.com')
-  const [password, setPassword] = useState('admin123')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -31,13 +31,7 @@ export default function LoginPage() {
       )
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  const fillQuick = (userEmail, userPass) => {
-    setError('')
-    setEmail(userEmail)
-    setPassword(userPass)
+      }
   }
 
   return (
@@ -172,40 +166,6 @@ export default function LoginPage() {
             {isLoading ? 'Connexion en cours...' : 'Se Connecter'}
           </button>
         </form>
-
-        {/* Demo Fast Logins */}
-        <div style={{ marginTop: '24px', paddingTop: '18px', borderTop: '1px solid var(--color-border-light)', textAlign: 'center' }}>
-          <small style={{ color: 'var(--color-text-dim)', fontSize: '11px', display: 'block', marginBottom: '10px' }}>
-            Accès rapide de démonstration :
-          </small>
-          <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button
-              type="button"
-              onClick={() => fillQuick
-                ('admin@jewelrypos.com', 'admin123')}
-              className="btn btn-secondary btn-sm"
-              style={{ borderRadius: '9999px', fontSize: '11px' }}
-            >
-              Admin (admin123)
-            </button>
-            <button
-              type="button"
-              onClick={() => fillQuick('manager@jewelrypos.com', 'manager123')}
-              className="btn btn-secondary btn-sm"
-              style={{ borderRadius: '9999px', fontSize: '11px' }}
-            >
-              Gestionnaire
-            </button>
-            <button
-              type="button"
-              onClick={() => fillQuick('caissier@jewelrypos.com', 'caissier123')}
-              className="btn btn-secondary btn-sm"
-              style={{ borderRadius: '9999px', fontSize: '11px' }}
-            >
-              Caissier
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   )
