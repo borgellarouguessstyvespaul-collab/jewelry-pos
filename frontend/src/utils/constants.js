@@ -1,10 +1,16 @@
 const getApiBaseUrl = () => {
-  if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL
-  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL
-  if (import.meta.env.DEV) {
-    return 'http://localhost:8000/api'
+  let url = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL
+  if (!url) {
+    if (import.meta.env.DEV) {
+      return 'http://localhost:8080/api'
+    }
+    url = 'https://jewelry-pos-sfji.onrender.com/api'
   }
-  return 'https://jewelry-pos.onrender.com/api'
+  url = url.trim().replace(/\/+$/, '')
+  if (!url.endsWith('/api')) {
+    url += '/api'
+  }
+  return url
 }
 
 export const API_BASE_URL = getApiBaseUrl()
