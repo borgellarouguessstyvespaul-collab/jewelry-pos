@@ -11,6 +11,8 @@ from app.core.config import settings
 from app.core.database import Base, engine
 from app.api import auth, users, categories, products, sales, stock, customers, reports, audit, archives
 
+from app.core.init_db import init_db
+
 # Ensure tables exist
 Base.metadata.create_all(bind=engine)
 
@@ -22,10 +24,15 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+@app.on_event("startup")
+def on_startup():
+    init_db()
+
+
 # CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*", "https://jewelry-pos.onrender.com", "https://jewelry-pos-tau.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

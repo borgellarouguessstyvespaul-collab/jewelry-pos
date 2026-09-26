@@ -181,7 +181,8 @@ export default function LoginPage() {
           <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <button
               type="button"
-              onClick={() => fillQuick('admin@jewelrypos.com', 'admin123')}
+              onClick={() => fillQuick
+                ('admin@jewelrypos.com', 'admin123')}
               className="btn btn-secondary btn-sm"
               style={{ borderRadius: '9999px', fontSize: '11px' }}
             >
