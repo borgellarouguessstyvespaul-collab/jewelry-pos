@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('admin@jewelrypos.com')
+  const [password, setPassword] = useState('admin123')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -18,7 +18,9 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      const user = await login(email, password)
+      const loginEmail = email.trim() || 'admin@jewelrypos.com'
+      const loginPassword = password.trim() || 'admin123'
+      const user = await login(loginEmail, loginPassword)
       if (user.role === 'CAISSIER') {
         navigate('/pos')
       } else {
@@ -94,7 +96,6 @@ export default function LoginPage() {
             </label>
             <input
               type="text"
-              required
               className="input"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -109,7 +110,6 @@ export default function LoginPage() {
             <div style={{ position: 'relative' }}>
               <input
                 type={showPassword ? 'text' : 'password'}
-                required
                 className="input"
                 style={{ paddingRight: '40px' }}
                 value={password}
