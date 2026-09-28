@@ -66,7 +66,7 @@ export default function LoginPage() {
             </span>
           </div>
           <p style={{ fontSize: '13px', color: 'var(--color-text-muted)', margin: 0 }}>
-            Système de Gestion & Caisse — Bijouterie & Luxe
+            Système de Gestion 
           </p>
         </div>
 
@@ -98,7 +98,7 @@ export default function LoginPage() {
               className="input"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@jewelrypos.com"
+             
             />
           </div>
 
@@ -114,7 +114,7 @@ export default function LoginPage() {
                 style={{ paddingRight: '40px' }}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+
               />
               <button
                 type="button"
