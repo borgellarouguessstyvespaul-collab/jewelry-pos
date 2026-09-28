@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('admin@jewelrypos.com')
-  const [password, setPassword] = useState('admin123')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -18,10 +18,8 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      const loginEmail = email.trim() || 'admin@jewelrypos.com'
-      const loginPassword = password.trim() || 'admin123'
-      const user = await login(loginEmail, loginPassword)
-      if (user.role === 'CAISSIER') {
+      const user = await login(email, password)
+      if (user?.role === 'CAISSIER') {
         navigate('/pos')
       } else {
         navigate('/dashboard')
@@ -33,7 +31,7 @@ export default function LoginPage() {
       )
     } finally {
       setIsLoading(false)
-      }
+    }
   }
 
   return (
@@ -61,7 +59,7 @@ export default function LoginPage() {
         <div style={{ textAlign: 'center', marginBottom: '28px' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
             <span style={{ fontSize: '32px', fontWeight: 800, color: '#1e564d', letterSpacing: '-0.05em' }}>
-              kisa
+              Jewelry
             </span>
             <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', borderLeft: '2px solid #1e564d', paddingLeft: '8px', textAlign: 'left', lineHeight: 1.1 }}>
               POS<br />BOUTIQUE
@@ -96,6 +94,7 @@ export default function LoginPage() {
             </label>
             <input
               type="text"
+              required
               className="input"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -110,6 +109,7 @@ export default function LoginPage() {
             <div style={{ position: 'relative' }}>
               <input
                 type={showPassword ? 'text' : 'password'}
+                required
                 className="input"
                 style={{ paddingRight: '40px' }}
                 value={password}
@@ -161,6 +161,9 @@ export default function LoginPage() {
               fontWeight: 700,
               marginTop: '8px',
               backgroundColor: '#1e564d',
+              color: '#ffffff',
+              border: 'none',
+              cursor: 'pointer'
             }}
           >
             {isLoading ? 'Connexion en cours...' : 'Se Connecter'}
