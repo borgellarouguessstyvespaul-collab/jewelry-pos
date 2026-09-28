@@ -461,6 +461,92 @@ tbody tr:last-child td {
   border-color: var(--color-primary-light);
 }
 
+/* ── Mobile Layout ── */
+@media (max-width: 768px) {
+  .app-viewport {
+    padding: 0;
+  }
+  
+  .app-frame {
+    padding: 0;
+    gap: 0;
+    border-radius: 0;
+    min-height: 100vh;
+    box-shadow: none;
+  }
+  
+  /* Prevent horizontal scroll on the main content */
+  .app-main-content {
+    max-width: 100vw;
+    overflow-x: hidden !important;
+    padding: 12px;
+  }
+  
+  .mobile-header-bar {
+    display: flex;
+  }
+  
+  .app-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: 100vh;
+    border-radius: 0;
+    z-index: 1000;
+    transform: translateX(-100%);
+  }
+
+  .app-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+  
+  .sidebar-mobile-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    backdrop-filter: blur(2px);
+    animation: fadeIn 0.3s ease;
+  }
+
+  .sidebar-close-btn {
+    display: block !important;
+  }
+  
+  .sidebar-hamburger-btn {
+    display: none !important;
+  }
+
+  /* Force structural grids to stack on mobile */
+  [style*="display: grid"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Force top headers to wrap */
+  .app-main-content > div > [style*="display: flex"] {
+    flex-wrap: wrap;
+  }
+
+  /* Specific fix for POS Page side-by-side view */
+  .pos-layout-row {
+    flex-direction: column !important;
+  }
+  .pos-cart-panel {
+    width: 100% !important;
+    height: 400px !important;
+  }
+  
+  /* Make modals responsive */
+  .modal-box {
+    width: 95% !important;
+    padding: 20px 16px !important;
+    margin: 10px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
 /* ── Layout & Sidebar ── */
 .app-sidebar {
   width: var(--sidebar-width);

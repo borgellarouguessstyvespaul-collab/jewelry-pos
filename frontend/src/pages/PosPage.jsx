@@ -152,7 +152,7 @@ export default function PosPage() {
         subtitle="Vente directe au comptoir avec lecteur code-barres et impression ticket"
       />
 
-      <div style={{ display: 'flex', flex: 1, minHeight: 0, gap: '16px' }}>
+      <div className="pos-layout-row" style={{ display: 'flex', flex: 1, minHeight: 0, gap: '16px' }}>
         {/* Left: Products Catalog & Search */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, padding: 'var(--space-4)', overflowY: 'hidden' }}>
           {/* Search bar & Collapsible Category Menu */}
@@ -329,7 +329,7 @@ export default function PosPage() {
         </div>
 
         {/* Right: Cart & Checkout */}
-        <div style={{ width: '380px', height: '100%' }}>
+        <div className="pos-cart-panel" style={{ width: '380px', height: '100%' }}>
           <Cart
             onCheckout={() => setIsPaymentOpen(true)}
           />
