@@ -28,7 +28,7 @@ export default function SalesPage() {
       setLoading(true)
       const data = await saleService.getAll({ limit: 200 })
       setSales(data || [])
-
+      
       // Louvri jounen jodi a pa defo
       if (data && data.length > 0) {
         const todayStr = new Date().toISOString().split('T')[0]
@@ -62,30 +62,56 @@ export default function SalesPage() {
     }
   }
 
-  // Gwoupe lavant yo pa dat (Jour par jour)
+  // Gwoupe lavant yo pa dat ak kalkil pwofi an tan reyèl
   const salesByDay = useMemo(() => {
     const groups = {}
     sales.forEach(sale => {
       const dateObj = new Date(sale.created_at || Date.now())
       const dayKey = dateObj.toISOString().split('T')[0] // Fòma YYYY-MM-DD
+      
       if (!groups[dayKey]) {
         groups[dayKey] = {
           dateStr: dayKey,
           formattedDate: dateObj.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
           items: [],
           totalAmount: 0,
+          totalProfit: 0,
           completedCount: 0
         }
       }
+      
       groups[dayKey].items.push(sale)
+      
       if (sale.status === 'COMPLETED') {
         groups[dayKey].totalAmount += Number(sale.total || 0)
         groups[dayKey].completedCount += 1
+
+        // Kalkil pwofi reyèl pou chak atik nan vant sa a
+        const saleProfit = (sale.sale_items || []).reduce((itemAcc, item) => {
+          const prixVente = Number(item.unit_price || item.price || 0)
+          const prixAchat = Number(item.cost_price || item.purchase_price || item.product?.cost_price || item.product?.purchase_price || 0)
+          const quantite = Number(item.quantity || 0)
+          return itemAcc + ((prixVente - prixAchat) * quantite)
+        }, 0)
+
+        groups[dayKey].totalProfit += saleProfit
       }
     })
+
     // Triye depi pi resan an pou ale nan pi ansyen an
     return Object.values(groups).sort((a, b) => b.dateStr.localeCompare(a.dateStr))
   }, [sales])
+
+  // Kalkil pwofi pou sèl yon sèl vant chwazi (pou modal detay yo)
+  const selectedSaleProfit = useMemo(() => {
+    if (!selectedSale || !selectedSale.sale_items) return 0
+    return selectedSale.sale_items.reduce((itemAcc, item) => {
+      const prixVente = Number(item.unit_price || item.price || 0)
+      const prixAchat = Number(item.cost_price || item.purchase_price || item.product?.cost_price || item.product?.purchase_price || 0)
+      const quantite = Number(item.quantity || 0)
+      return itemAcc + ((prixVente - prixAchat) * quantite)
+    }, 0)
+  }, [selectedSale])
 
   const toggleDay = (dayKey) => {
     setExpandedDays(prev => ({ ...prev, [dayKey]: !prev[dayKey] }))
@@ -103,8 +129,8 @@ export default function SalesPage() {
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
       <Header
-        title="Historique des Ventes par Jour & Archives"
-        subtitle="Suivi des transactions journalières, ventilation par jour et archivage automatique"
+        title="Historique des Ventes par Jour & Bénéfices"
+        subtitle="Suivi des transactions journalières, ventilation par jour et calcul des profits en temps réel"
       />
 
       {successMsg && (
@@ -149,7 +175,7 @@ export default function SalesPage() {
                   opacity: isArchived ? 0.85 : 1
                 }}
               >
-                {/* Antèt Jounen an */}
+                {/* Antèt Jounen an ak Total Ventes & Bénéfice */}
                 <div
                   onClick={() => toggleDay(group.dateStr)}
                   className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 sm:px-5 sm:py-3.5 cursor-pointer select-none transition-colors"
@@ -176,8 +202,9 @@ export default function SalesPage() {
                           </span>
                         )}
                       </div>
-                      <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
-                        Total Ventes: <strong style={{ color: '#1e564d' }}>{formatCurrency(group.totalAmount)}</strong>
+                      <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '4px', display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+                        <span>Total Ventes: <strong style={{ color: '#1e564d' }}>{formatCurrency(group.totalAmount)}</strong></span>
+                        <span>Bénéfice (Pwofi): <strong style={{ color: '#16a34a' }}>{formatCurrency(group.totalProfit)}</strong></span>
                       </div>
                     </div>
                   </div>
@@ -227,8 +254,9 @@ export default function SalesPage() {
                               </td>
                               <td>
                                 <span
-                                  className={`badge ${sale.status === 'COMPLETED' ? 'badge-success' : 'badge-danger'
-                                    }`}
+                                  className={`badge ${
+                                    sale.status === 'COMPLETED' ? 'badge-success' : 'badge-danger'
+                                  }`}
                                   style={{ fontSize: '11px' }}
                                 >
                                   {sale.status === 'COMPLETED' ? 'Complétée' : 'Annulée'}
@@ -319,7 +347,16 @@ export default function SalesPage() {
                 <span>Total Net:</span>
                 <span style={{ color: 'var(--color-accent-light)' }}>{formatCurrency(selectedSale.total)}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--color-text-muted)' }}>
+              
+              {/* Afichaj Pwofi pou ticket sa a an patikilye */}
+              {isAdmin && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#16a34a', fontWeight: 700, paddingTop: '4px' }}>
+                  <span>Bénéfice (Pwofi Vye sa a):</span>
+                  <span>{formatCurrency(selectedSaleProfit)}</span>
+                </div>
+              )}
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--color-text-muted)', paddingTop: '4px' }}>
                 <span>Montant reçu:</span>
                 <span>{formatCurrency(selectedSale.amount_received)}</span>
               </div>

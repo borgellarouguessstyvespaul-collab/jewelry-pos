@@ -70,9 +70,26 @@ export default function Header({ title = 'Dashboard', subtitle, actions }) {
   } catch {}
 
   const totalNotifs = lowStockItems.length + (isAdmin ? securityNotifs.length : 0)
+  const hasNewNotifs = totalNotifs > 0
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '20px' }}>
+      {/* CSS Animation pou Kloch la */}
+      <style>{`
+        @keyframes shake {
+          0% { transform: rotate(0deg); }
+          20% { transform: rotate(15deg); }
+          40% { transform: rotate(-15deg); }
+          60% { transform: rotate(10deg); }
+          80% { transform: rotate(-10deg); }
+          100% { transform: rotate(0deg); }
+        }
+        .bell-shake {
+          animation: shake 0.5s ease-in-out infinite;
+          display: inline-block;
+        }
+      `}</style>
+
       {/* Top Navbar Row */}
       <div
         style={{
@@ -135,16 +152,15 @@ export default function Header({ title = 'Dashboard', subtitle, actions }) {
               }}
               onClick={() => setNotifOpen(!notifOpen)}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-              </svg>
+              <span className={hasNewNotifs ? 'bell-shake' : ''} style={{ fontSize: '16px' }}>
+                🔔
+              </span>
               {totalNotifs > 0 && (
                 <span
                   style={{
                     position: 'absolute',
-                    top: '6px',
-                    right: '6px',
+                    top: '-4px',
+                    right: '-4px',
                     minWidth: '8px',
                     height: '8px',
                     borderRadius: '50%',
