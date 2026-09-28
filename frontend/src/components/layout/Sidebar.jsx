@@ -2,12 +2,11 @@ import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
-export default function Sidebar() {
+export default function Sidebar({ mobileOpen, onCloseMobile }) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const role = user?.role
 
-  // Navigation config based on roles
   const mainNavItems = [
     {
       to: '/dashboard',
@@ -45,7 +44,7 @@ export default function Sidebar() {
     },
     {
       to: '/products',
-      label: 'Inventaire Général',
+      label: 'Inventaire',
       icon: (
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
@@ -121,24 +120,14 @@ export default function Sidebar() {
   const filteredMain = mainNavItems.filter((i) => !i.roles || i.roles.includes(role))
   const filteredSecondary = secondaryNavItems.filter((i) => !i.roles || i.roles.includes(role))
 
-  return (
-    <aside
-      style={{
-        width: '210px',
-        backgroundColor: 'var(--color-sidebar)',
-        borderRadius: '20px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        padding: '24px 14px',
-        color: 'var(--color-sidebar-text)',
-        flexShrink: 0,
-        height: '100%',
-        maxHeight: 'calc(100vh - 64px)',
-      }}
-    >
+  const handleNavClick = () => {
+    if (onCloseMobile) onCloseMobile()
+  }
+
+  const sidebarContent = (
+    <>
       <div>
-        {/* Top Logo and Hamburger Menu */}
+        {/* Top Logo */}
         <div
           style={{
             display: 'flex',
@@ -147,7 +136,6 @@ export default function Sidebar() {
             padding: '0 8px 24px 8px',
           }}
         >
-          {/* Logo "kisa" style */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span
               style={{
@@ -177,10 +165,32 @@ export default function Sidebar() {
             </span>
           </div>
 
-          {/* Hamburger icon */}
+          {/* Close button on mobile */}
+          <button
+            type="button"
+            className="sidebar-close-btn"
+            onClick={onCloseMobile}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#ffffff',
+              cursor: 'pointer',
+              padding: '6px',
+              borderRadius: '6px',
+              display: 'none',
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+
+          {/* Hamburger icon (desktop only) */}
           <button
             type="button"
             title="Menu"
+            className="sidebar-hamburger-btn"
             style={{
               background: 'transparent',
               border: 'none',
@@ -205,6 +215,7 @@ export default function Sidebar() {
             <NavLink
               key={item.to}
               to={item.to}
+              onClick={handleNavClick}
               style={({ isActive }) => ({
                 display: 'flex',
                 alignItems: 'center',
@@ -253,6 +264,7 @@ export default function Sidebar() {
             <NavLink
               key={item.to}
               to={item.to}
+              onClick={handleNavClick}
               style={({ isActive }) => ({
                 display: 'flex',
                 alignItems: 'center',
@@ -290,7 +302,7 @@ export default function Sidebar() {
       {/* Quick logout link at bottom */}
       <div style={{ padding: '0 8px' }}>
         <button
-          onClick={logout}
+          onClick={() => { handleNavClick(); logout(); }}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -310,6 +322,23 @@ export default function Sidebar() {
           <span>Déconnexion</span>
         </button>
       </div>
-    </aside>
+    </>
+  )
+
+  return (
+    <>
+      {/* Mobile overlay backdrop */}
+      {mobileOpen && (
+        <div
+          className="sidebar-mobile-overlay"
+          onClick={onCloseMobile}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`app-sidebar ${mobileOpen ? 'mobile-open' : ''}`}>
+        {sidebarContent}
+      </aside>
+    </>
   )
 }
