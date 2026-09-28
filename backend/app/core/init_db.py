@@ -12,41 +12,17 @@ from app.core.permissions import UserRole
 def init_db():
     db: Session = SessionLocal()
     try:
-        # Check / Seed Admin
+        # Check / Seed Admin (only if not existing)
         admin = db.query(User).filter(User.email == "admin@jewelrypos.com").first()
         if not admin:
             admin = User(
-                name="Admin (Administrateur)",
+                name="admin",
                 email="admin@jewelrypos.com",
                 password_hash=hash_password("admin123"),
                 role=UserRole.ADMIN,
                 is_active=True
             )
             db.add(admin)
-
-        # Check / Seed Manager
-        manager = db.query(User).filter(User.email == "manager@jewelrypos.com").first()
-        if not manager:
-            manager = User(
-                name="Claire Laurent (Gestionnaire)",
-                email="manager@jewelrypos.com",
-                password_hash=hash_password("manager123"),
-                role=UserRole.GESTIONNAIRE,
-                is_active=True
-            )
-            db.add(manager)
-
-        # Check / Seed Cashier
-        cashier = db.query(User).filter(User.email == "caissier@jewelrypos.com").first()
-        if not cashier:
-            cashier = User(
-                name="Sophie Martin (Caissière)",
-                email="caissier@jewelrypos.com",
-                password_hash=hash_password("caissier123"),
-                role=UserRole.CAISSIER,
-                is_active=True
-            )
-            db.add(cashier)
 
         # Seed default categories if none exist
         from app.models.category import Category
