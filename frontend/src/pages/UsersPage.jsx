@@ -255,23 +255,25 @@ export default function UsersPage() {
                         <td style={{ color: 'var(--color-text-dim)', fontSize: '12px' }}>
                           {formatDate(u.created_at)}
                         </td>
-                        <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-                          <button
-                            onClick={() => handleOpenEdit(u)}
-                            className="btn btn-secondary btn-sm"
-                            style={{ marginRight: '6px', fontSize: '12px' }}
-                          >
-                            Modifier
-                          </button>
-                          {!isUserAdmin && (
+                        <td style={{ textAlign: 'right' }}>
+                          <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
                             <button
-                              onClick={() => handleDelete(u)}
-                              className="btn btn-sm"
-                              style={{ color: 'var(--color-danger)', border: '1px solid #fecdd3', background: '#fff1f2', fontSize: '12px' }}
+                              onClick={() => handleOpenEdit(u)}
+                              className="btn btn-secondary btn-sm"
+                              style={{ fontSize: '12px' }}
                             >
-                              Supprimer
+                              Modifier
                             </button>
-                          )}
+                            {!isUserAdmin && (
+                              <button
+                                onClick={() => handleDelete(u)}
+                                className="btn btn-sm"
+                                style={{ color: 'var(--color-danger)', border: '1px solid #fecdd3', background: '#fff1f2', fontSize: '12px' }}
+                              >
+                                Supprimer
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     )

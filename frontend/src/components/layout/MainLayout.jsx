@@ -19,6 +19,7 @@ export default function MainLayout() {
             display: 'flex',
             flexDirection: 'column',
             overflowY: 'auto',
+            overflowX: 'hidden',
             height: '100%',
           }}
         >

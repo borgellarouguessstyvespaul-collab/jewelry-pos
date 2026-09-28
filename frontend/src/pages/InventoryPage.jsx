@@ -288,8 +288,8 @@ export default function InventoryPage() {
         )}
 
         {/* Global Filter Bar */}
-        <div className="card" style={{ padding: '14px 18px', display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
-          <div style={{ flex: 2, minWidth: '240px' }}>
+        <div className="card filter-bar" style={{ padding: '14px 18px', display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <div className="filter-input-wrapper">
             <input
               type="text"
               className="input"
@@ -299,7 +299,7 @@ export default function InventoryPage() {
             />
           </div>
 
-          <div style={{ flex: 1, minWidth: '180px' }}>
+          <div className="filter-select-wrapper">
             <select
               className="input"
               value={selectedCategory}
@@ -314,7 +314,7 @@ export default function InventoryPage() {
             </select>
           </div>
 
-          <div style={{ flex: 1, minWidth: '160px' }}>
+          <div className="filter-select-wrapper-sm">
             <select
               className="input"
               value={selectedStatus}
@@ -473,8 +473,8 @@ export default function InventoryPage() {
                           </td>
 
                           {/* 9. Actions */}
-                          <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-                            <div style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
+                          <td style={{ textAlign: 'right' }}>
+                            <div className="action-buttons-cell">
                               {/* Fast restock button "Faire le plein" */}
                               {canManage && (
                                 <button
