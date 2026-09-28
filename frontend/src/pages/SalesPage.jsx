@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import Header from '../components/layout/Header'
 import Modal from '../components/common/Modal'
 import saleService from '../services/saleService'
@@ -12,6 +12,8 @@ export default function SalesPage() {
   const [selectedSale, setSelectedSale] = useState(null)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [successMsg, setSuccessMsg] = useState('')
+  const [archivedDays, setArchivedDays] = useState({})
+  const [expandedDays, setExpandedDays] = useState({})
 
   const { user } = useAuth()
   const isAdmin = user?.role === 'ADMIN'
@@ -24,8 +26,14 @@ export default function SalesPage() {
   const loadSales = useCallback(async () => {
     try {
       setLoading(true)
-      const data = await saleService.getAll({ limit: 100 })
+      const data = await saleService.getAll({ limit: 200 })
       setSales(data || [])
+
+      // Louvri jounen jodi a pa defo
+      if (data && data.length > 0) {
+        const todayStr = new Date().toISOString().split('T')[0]
+        setExpandedDays(prev => ({ ...prev, [todayStr]: true }))
+      }
     } catch (err) {
       console.error(err)
     } finally {
@@ -42,12 +50,11 @@ export default function SalesPage() {
     setIsDetailModalOpen(true)
   }
 
-  // Fonksyon pou anile/siprime vant la epi mete ajou Dashboard la ak Estòk la otomatikman
   const handleCancelSale = async (saleId) => {
-    if (!window.confirm('Voulez-vous vraiment annuler cette vente ? Le montant sera déduit du Dashboard et le stock sera restitué.')) return
+    if (!window.confirm('Voulez-vous vraiment annuler cette vente ? Le montant sera déduit et le stock restitué.')) return
     try {
       await saleService.cancel(saleId)
-      showSuccess('Vente annulée avec succès. Le Dashboard et les finances ont été mis à jour.')
+      showSuccess('Vente annulée avec succès. Dashboard et stocks mis à jour.')
       setIsDetailModalOpen(false)
       loadSales()
     } catch (err) {
@@ -55,11 +62,49 @@ export default function SalesPage() {
     }
   }
 
+  // Gwoupe lavant yo pa dat (Jour par jour)
+  const salesByDay = useMemo(() => {
+    const groups = {}
+    sales.forEach(sale => {
+      const dateObj = new Date(sale.created_at || Date.now())
+      const dayKey = dateObj.toISOString().split('T')[0] // Fòma YYYY-MM-DD
+      if (!groups[dayKey]) {
+        groups[dayKey] = {
+          dateStr: dayKey,
+          formattedDate: dateObj.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+          items: [],
+          totalAmount: 0,
+          completedCount: 0
+        }
+      }
+      groups[dayKey].items.push(sale)
+      if (sale.status === 'COMPLETED') {
+        groups[dayKey].totalAmount += Number(sale.total || 0)
+        groups[dayKey].completedCount += 1
+      }
+    })
+    // Triye depi pi resan an pou ale nan pi ansyen an
+    return Object.values(groups).sort((a, b) => b.dateStr.localeCompare(a.dateStr))
+  }, [sales])
+
+  const toggleDay = (dayKey) => {
+    setExpandedDays(prev => ({ ...prev, [dayKey]: !prev[dayKey] }))
+  }
+
+  const toggleArchiveDay = (dayKey, e) => {
+    e.stopPropagation()
+    setArchivedDays(prev => {
+      const newState = { ...prev, [dayKey]: !prev[dayKey] }
+      return newState
+    })
+    showSuccess(archivedDays[dayKey] ? `Journée ${dayKey} désarchivée.` : `Journée ${dayKey} archivée avec succès !`)
+  }
+
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
       <Header
-        title="Historique des Ventes"
-        subtitle="Consultation des tickets émis, réimpression et annulations en direct"
+        title="Historique des Ventes par Jour & Archives"
+        subtitle="Suivi des transactions journalières, ventilation par jour et archivage automatique"
       />
 
       {successMsg && (
@@ -80,96 +125,156 @@ export default function SalesPage() {
       )}
 
       <div style={{ padding: 'var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-          {loading ? (
-            <div style={{ padding: '40px', display: 'flex', justifyContent: 'center' }}>
-              <div className="spinner"></div>
-            </div>
-          ) : (
-            <div className="table-wrapper overflow-x-auto">
-              <table style={{ width: '100%', minWidth: '750px' }}>
-                <thead>
-                  <tr>
-                    <th>N° Ticket</th>
-                    <th>Date & Heure</th>
-                    <th>Articles</th>
-                    <th>Total Net</th>
-                    <th>Paiement</th>
-                    <th>Statut</th>
-                    <th style={{ textAlign: 'right' }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sales.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} style={{ textAlign: 'center', padding: '30px', color: 'var(--color-text-muted)' }}>
-                        Aucune vente enregistrée.
-                      </td>
-                    </tr>
-                  ) : (
-                    sales.map((sale) => (
-                      <tr key={sale.id} style={{ borderTop: '1px solid var(--color-border)' }}>
-                        <td>
-                          <strong style={{ color: '#1e564d' }}>{sale.sale_number}</strong>
-                        </td>
-                        <td style={{ color: 'var(--color-text-dim)', fontSize: '12px' }}>
-                          {formatDate(sale.created_at)}
-                        </td>
-                        <td>{sale.sale_items?.length || 0} article(s)</td>
-                        <td style={{ fontWeight: 800, color: 'var(--color-accent-light)' }}>
-                          {formatCurrency(sale.total)}
-                        </td>
-                        <td>
-                          <span className="badge badge-info" style={{ fontSize: '11px' }}>{sale.payment_method}</span>
-                        </td>
-                        <td>
-                          <span
-                            className={`badge ${sale.status === 'COMPLETED' ? 'badge-success' : 'badge-danger'
-                              }`}
-                            style={{ fontSize: '11px' }}
-                          >
-                            {sale.status === 'COMPLETED' ? 'Complétée' : 'Annulée'}
+        {loading ? (
+          <div className="card" style={{ padding: '40px', display: 'flex', justifyContent: 'center' }}>
+            <div className="spinner"></div>
+          </div>
+        ) : salesByDay.length === 0 ? (
+          <div className="card" style={{ padding: '40px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+            Aucune vente enregistrée pour le moment.
+          </div>
+        ) : (
+          salesByDay.map((group) => {
+            const isOpen = !!expandedDays[group.dateStr]
+            const isArchived = !!archivedDays[group.dateStr]
+
+            return (
+              <div
+                key={group.dateStr}
+                className="card"
+                style={{
+                  padding: 0,
+                  overflow: 'hidden',
+                  border: isArchived ? '1px dashed #cbd5e1' : '1px solid var(--color-border)',
+                  opacity: isArchived ? 0.85 : 1
+                }}
+              >
+                {/* Antèt Jounen an */}
+                <div
+                  onClick={() => toggleDay(group.dateStr)}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 sm:px-5 sm:py-3.5 cursor-pointer select-none transition-colors"
+                  style={{
+                    backgroundColor: isOpen ? '#f0f9f6' : 'var(--color-surface)',
+                    borderBottom: isOpen ? '1px solid var(--color-border)' : 'none',
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    <span style={{ fontSize: '14px', color: '#1e564d', transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
+                      ▶
+                    </span>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span style={{ fontWeight: 700, fontSize: '15px', color: 'var(--color-text)', textTransform: 'capitalize' }}>
+                          {group.formattedDate}
+                        </span>
+                        <span className="badge badge-info" style={{ fontSize: '11px' }}>
+                          {group.completedCount} vente(s)
+                        </span>
+                        {isArchived && (
+                          <span style={{ padding: '2px 8px', borderRadius: '9999px', fontSize: '11px', fontWeight: 700, backgroundColor: '#f3f4f6', color: '#4b5563', border: '1px solid #d1d5db' }}>
+                            Archivé 📦
                           </span>
-                        </td>
-                        <td style={{ textAlign: 'right' }}>
-                          <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
-                            <button
-                              onClick={() => handleOpenDetail(sale)}
-                              className="btn btn-secondary btn-sm"
-                              style={{ fontSize: '12px' }}
-                            >
-                              Détails
-                            </button>
-                            <button
-                              onClick={() => printReceipt(sale)}
-                              className="btn btn-secondary btn-sm"
-                              style={{ fontSize: '12px' }}
-                            >
-                              Reçu
-                            </button>
-                            {isAdmin && sale.status === 'COMPLETED' && (
-                              <button
-                                onClick={() => handleCancelSale(sale.id)}
-                                className="btn btn-secondary btn-sm"
-                                style={{ fontSize: '12px', color: 'var(--color-danger)', borderColor: '#fecdd3' }}
-                                title="Anile vant lan epi wete kòb la nan Dashboard la"
-                              >
-                                Anile
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+                        )}
+                      </div>
+                      <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                        Total Ventes: <strong style={{ color: '#1e564d' }}>{formatCurrency(group.totalAmount)}</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      onClick={(e) => toggleArchiveDay(group.dateStr, e)}
+                      className="btn btn-secondary btn-sm"
+                      style={{ fontSize: '12px' }}
+                    >
+                      {isArchived ? 'Désarchiver' : '📦 Archiver la Journée'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Lis Vant pou Jounen sa a */}
+                {isOpen && (
+                  <div style={{ animation: 'fadeIn 0.2s ease' }}>
+                    <div className="table-wrapper overflow-x-auto">
+                      <table style={{ width: '100%', minWidth: '750px', fontSize: '13px' }}>
+                        <thead>
+                          <tr style={{ backgroundColor: '#f9fafb' }}>
+                            <th>N° Ticket</th>
+                            <th>Heure</th>
+                            <th>Articles</th>
+                            <th>Total Net</th>
+                            <th>Paiement</th>
+                            <th>Statut</th>
+                            <th style={{ textAlign: 'right' }}>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {group.items.map((sale) => (
+                            <tr key={sale.id} style={{ borderTop: '1px solid var(--color-border)' }}>
+                              <td>
+                                <strong style={{ color: '#1e564d' }}>{sale.sale_number}</strong>
+                              </td>
+                              <td style={{ color: 'var(--color-text-dim)', fontSize: '12px' }}>
+                                {new Date(sale.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </td>
+                              <td>{sale.sale_items?.length || 0} article(s)</td>
+                              <td style={{ fontWeight: 800, color: 'var(--color-accent-light)' }}>
+                                {formatCurrency(sale.total)}
+                              </td>
+                              <td>
+                                <span className="badge badge-info" style={{ fontSize: '11px' }}>{sale.payment_method}</span>
+                              </td>
+                              <td>
+                                <span
+                                  className={`badge ${sale.status === 'COMPLETED' ? 'badge-success' : 'badge-danger'
+                                    }`}
+                                  style={{ fontSize: '11px' }}
+                                >
+                                  {sale.status === 'COMPLETED' ? 'Complétée' : 'Annulée'}
+                                </span>
+                              </td>
+                              <td style={{ textAlign: 'right' }}>
+                                <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+                                  <button
+                                    onClick={() => handleOpenDetail(sale)}
+                                    className="btn btn-secondary btn-sm"
+                                    style={{ fontSize: '12px' }}
+                                  >
+                                    Détails
+                                  </button>
+                                  <button
+                                    onClick={() => printReceipt(sale)}
+                                    className="btn btn-secondary btn-sm"
+                                    style={{ fontSize: '12px' }}
+                                  >
+                                    Reçu
+                                  </button>
+                                  {isAdmin && sale.status === 'COMPLETED' && (
+                                    <button
+                                      onClick={() => handleCancelSale(sale.id)}
+                                      className="btn btn-secondary btn-sm"
+                                      style={{ fontSize: '12px', color: 'var(--color-danger)', borderColor: '#fecdd3' }}
+                                    >
+                                      Anile
+                                    </button>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
+          })
+        )}
       </div>
 
-      {/* Sale Detail Modal */}
+      {/* Modal Detay Vant */}
       <Modal
         isOpen={isDetailModalOpen}
         onClose={() => setIsDetailModalOpen(false)}
