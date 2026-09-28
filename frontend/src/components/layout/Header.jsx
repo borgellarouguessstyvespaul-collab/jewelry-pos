@@ -82,7 +82,7 @@ export default function Header({ title = 'Dashboard', subtitle, actions }) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '20px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '20px', width: '100%' }}>
       {/* CSS Animation pou Kloch la (Souke yon sèl fwa sèlman: 1) */}
       <style>{`
         @keyframes shake {
@@ -105,11 +105,13 @@ export default function Header({ title = 'Dashboard', subtitle, actions }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px',
           padding: '4px 0',
         }}
       >
         {/* Live Clock & Operating Status */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
           <div
             style={{
               display: 'flex',
@@ -120,6 +122,7 @@ export default function Header({ title = 'Dashboard', subtitle, actions }) {
               border: '1px solid var(--color-border)',
               borderRadius: 'var(--radius-lg)',
               boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+              flexWrap: 'wrap',
             }}
           >
             <span style={{ fontSize: '14px', fontWeight: 800, fontFamily: 'monospace', color: 'var(--color-primary-dark)' }}>
@@ -139,7 +142,7 @@ export default function Header({ title = 'Dashboard', subtitle, actions }) {
         </div>
 
         {/* Right tools: Notifications & User Profile */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
           {/* Notification bell & Clear Cross */}
           <div ref={notifRef} style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <button
@@ -214,7 +217,8 @@ export default function Header({ title = 'Dashboard', subtitle, actions }) {
                   position: 'absolute',
                   top: '110%',
                   right: 0,
-                  width: '340px',
+                  width: '100vw',
+                  maxWidth: '340px',
                   backgroundColor: '#ffffff',
                   borderRadius: 'var(--radius-lg)',
                   border: '1px solid var(--color-border)',
@@ -334,6 +338,7 @@ export default function Header({ title = 'Dashboard', subtitle, actions }) {
                   fontSize: '14px',
                   overflow: 'hidden',
                   border: '1.5px solid #edf2f0',
+                  flexShrink: 0,
                 }}
               >
                 {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'M'}
@@ -374,7 +379,7 @@ export default function Header({ title = 'Dashboard', subtitle, actions }) {
                 }}
               >
                 <div style={{ padding: '8px 14px', borderBottom: '1px solid var(--color-border-light)' }}>
-                  <div style={{ fontSize: '12px', fontWeight: 600 }}>{user?.email || 'admin@jewelrypos.com'}</div>
+                  <div style={{ fontSize: '12px', fontWeight: 600, wordBreak: 'break-all' }}>{user?.email || 'admin@jewelrypos.com'}</div>
                   <span className="badge badge-primary" style={{ fontSize: '10px', marginTop: '4px', backgroundColor: '#1e564d' }}>
                     {user?.role || 'ADMIN'}
                   </span>
@@ -433,6 +438,8 @@ export default function Header({ title = 'Dashboard', subtitle, actions }) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '12px',
             paddingTop: '4px',
           }}
         >
@@ -456,7 +463,7 @@ export default function Header({ title = 'Dashboard', subtitle, actions }) {
           </div>
 
           {actions && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
               {actions}
             </div>
           )}
