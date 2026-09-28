@@ -12,6 +12,7 @@ export default function Header({ title = 'Dashboard', subtitle, actions }) {
   const [lowStockItems, setLowStockItems] = useState([])
   const [securityNotifs, setSecurityNotifs] = useState([])
   const [currentTime, setCurrentTime] = useState('')
+  const [notificationsCleared, setNotificationsCleared] = useState(false)
   const dropdownRef = useRef(null)
   const notifRef = useRef(null)
   const navigate = useNavigate()
@@ -69,12 +70,20 @@ export default function Header({ title = 'Dashboard', subtitle, actions }) {
     }
   } catch {}
 
-  const totalNotifs = lowStockItems.length + (isAdmin ? securityNotifs.length : 0)
+  const totalNotifs = notificationsCleared ? 0 : (lowStockItems.length + (isAdmin ? securityNotifs.length : 0))
   const hasNewNotifs = totalNotifs > 0
+
+  const handleClearNotifications = (e) => {
+    e.stopPropagation()
+    setNotificationsCleared(true)
+    setLowStockItems([])
+    setSecurityNotifs([])
+    setNotifOpen(false)
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '20px' }}>
-      {/* CSS Animation pou Kloch la */}
+      {/* CSS Animation pou Kloch la (Souke yon sèl fwa sèlman: 1) */}
       <style>{`
         @keyframes shake {
           0% { transform: rotate(0deg); }
@@ -85,7 +94,7 @@ export default function Header({ title = 'Dashboard', subtitle, actions }) {
           100% { transform: rotate(0deg); }
         }
         .bell-shake {
-          animation: shake 0.5s ease-in-out infinite;
+          animation: shake 0.5s ease-in-out 1;
           display: inline-block;
         }
       `}</style>
@@ -130,9 +139,9 @@ export default function Header({ title = 'Dashboard', subtitle, actions }) {
         </div>
 
         {/* Right tools: Notifications & User Profile */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          {/* Notification bell */}
-          <div ref={notifRef} style={{ position: 'relative' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {/* Notification bell & Clear Cross */}
+          <div ref={notifRef} style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <button
               type="button"
               title="Notifications"
@@ -170,6 +179,33 @@ export default function Header({ title = 'Dashboard', subtitle, actions }) {
                 />
               )}
             </button>
+
+            {/* Ti kwa bo kotel pou efase notifikasyon yo */}
+            {totalNotifs > 0 && (
+              <button
+                type="button"
+                title="Effacer les notifications"
+                onClick={handleClearNotifications}
+                style={{
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '50%',
+                  border: '1px solid #d1d5db',
+                  backgroundColor: '#f3f4f6',
+                  color: '#374151',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  padding: 0,
+                  lineHeight: 1,
+                }}
+              >
+                ×
+              </button>
+            )}
 
             {/* Notification Dropdown Panel */}
             {notifOpen && (

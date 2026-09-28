@@ -41,7 +41,7 @@ export default function AuditPage() {
       if (!log.created_at) return true
       const dateObj = new Date(log.created_at)
       const logYear = dateObj.getFullYear().toString()
-      const logMonth = (dateObj.getMonth() + 1).toString().padStart(2, '0') // '01', '02', ...
+      const logMonth = (dateObj.getMonth() + 1).toString().padStart(2, '0')
 
       if (yearFilter && logYear !== yearFilter) return false
       if (monthFilter && logMonth !== monthFilter) return false
@@ -49,7 +49,7 @@ export default function AuditPage() {
     })
   }, [logs, yearFilter, monthFilter])
 
-  // Lis ane disponib yo (dapre log ki la yo oswa ane aktyèl la)
+  // Lis ane disponib yo
   const availableYears = useMemo(() => {
     const years = new Set()
     logs.forEach(log => {
@@ -65,12 +65,11 @@ export default function AuditPage() {
     const periodeStr = monthFilter ? `Mois ${monthFilter}/${yearFilter || new Date().getFullYear()}` : `Année ${yearFilter || new Date().getFullYear()}`
     if (!window.confirm(`Voulez-vous vraiment verrouiller et valider l'audit pour ${periodeStr} ?`)) return
 
-    // Isit la ou ka konekte l ak backend ou an (egz: auditService.closePeriod(...))
     showSuccess(`Période (${periodeStr}) clôturée et verrouillée avec succès pour l'audit ! `)
   }
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto', backgroundColor: '#ffffff' }}>
       <Header
         title="Journal d'Audit & Sécurité"
         subtitle="Historique immuable, filtrage par période (mois, année) et clôture des registres"
@@ -81,10 +80,10 @@ export default function AuditPage() {
           style={{
             margin: 'var(--space-4) var(--space-6) 0',
             padding: '12px 18px',
-            backgroundColor: '#dcfce7',
-            border: '1px solid #86efac',
+            backgroundColor: '#ffffff',
+            border: '1px solid #d1d5db',
             borderRadius: 'var(--radius-lg)',
-            color: '#166534',
+            color: '#1f2937',
             fontWeight: 600,
             fontSize: '13px',
           }}
@@ -93,15 +92,15 @@ export default function AuditPage() {
         </div>
       )}
 
-      <div style={{ padding: 'var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+      <div style={{ padding: 'var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', backgroundColor: '#ffffff' }}>
         {/* Zòn Filtè yo ak Bouton Clôture */}
-        <div className="card" style={{ padding: 'var(--space-4)', display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="card" style={{ padding: 'var(--space-4)', display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', flex: 1 }}>
             <select
               className="input"
               value={actionFilter}
               onChange={(e) => setActionFilter(e.target.value)}
-              style={{ maxWidth: '280px' }}
+              style={{ maxWidth: '280px', backgroundColor: '#ffffff', color: '#1f2937' }}
             >
               <option value="">Toutes les actions (Rapport complet)</option>
               <option value="PASSWORD_CHANGED">Changements de mots de passe</option>
@@ -118,7 +117,7 @@ export default function AuditPage() {
               className="input"
               value={yearFilter}
               onChange={(e) => setYearFilter(e.target.value)}
-              style={{ width: '130px' }}
+              style={{ width: '130px', backgroundColor: '#ffffff', color: '#1f2937' }}
             >
               <option value="">Toutes les années</option>
               {availableYears.map(yr => (
@@ -131,7 +130,7 @@ export default function AuditPage() {
               className="input"
               value={monthFilter}
               onChange={(e) => setMonthFilter(e.target.value)}
-              style={{ width: '150px' }}
+              style={{ width: '150px', backgroundColor: '#ffffff', color: '#1f2937' }}
             >
               <option value="">Tous les mois</option>
               <option value="01">Janvier</option>
@@ -152,74 +151,68 @@ export default function AuditPage() {
           <div>
             <button
               onClick={handleCloturePeriode}
-              className="btn btn-primary"
-              style={{ fontSize: '13px', backgroundColor: '#1e564d' }}
+              className="btn"
+              style={{ fontSize: '13px', backgroundColor: '#ffffff', color: '#1f2937', border: '1px solid #d1d5db' }}
             >
-              🔒 Clôturer la Période
+               Clôturer la Période
             </button>
           </div>
         </div>
 
-        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+        <div className="card" style={{ padding: 0, overflow: 'hidden', backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}>
           {loading ? (
             <div style={{ padding: '40px', display: 'flex', justifyContent: 'center' }}>
               <div className="spinner"></div>
             </div>
           ) : (
             <div className="table-wrapper">
-              <table>
+              <table style={{ width: '100%', backgroundColor: '#ffffff', color: '#1f2937' }}>
                 <thead>
-                  <tr>
-                    <th>Date & Heure</th>
-                    <th>Utilisateur</th>
-                    <th>Action</th>
-                    <th>Détails / Mot de passe</th>
-                    <th>Adresse IP</th>
+                  <tr style={{ backgroundColor: '#ffffff', borderBottom: '1px solid #e5e7eb' }}>
+                    <th style={{ color: '#1f2937', padding: '12px' }}>Date & Heure</th>
+                    <th style={{ color: '#1f2937', padding: '12px' }}>Utilisateur</th>
+                    <th style={{ color: '#1f2937', padding: '12px' }}>Action</th>
+                    <th style={{ color: '#1f2937', padding: '12px' }}>Détails / Mot de passe</th>
+                    <th style={{ color: '#1f2937', padding: '12px' }}>Adresse IP</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredLogs.length === 0 ? (
                     <tr>
-                      <td colSpan={5} style={{ textAlign: 'center', padding: '30px', color: 'var(--color-text-muted)' }}>
+                      <td colSpan={5} style={{ textAlign: 'center', padding: '30px', color: '#6b7280' }}>
                         Aucun journal d'audit trouvé pour cette période ou ce filtre.
                       </td>
                     </tr>
                   ) : (
                     filteredLogs.map((log) => {
-                      const isPwdChange = log.action === 'PASSWORD_CHANGED'
                       return (
-                        <tr key={log.id} style={{ backgroundColor: isPwdChange ? '#fefce8' : 'transparent' }}>
-                          <td style={{ color: 'var(--color-text-dim)', fontSize: '12px', whiteSpace: 'nowrap' }}>
+                        <tr key={log.id} style={{ backgroundColor: '#ffffff', borderBottom: '1px solid #f3f4f6' }}>
+                          <td style={{ color: '#4b5563', fontSize: '12px', whiteSpace: 'nowrap', padding: '12px' }}>
                             {formatDate(log.created_at)}
                           </td>
-                          <td>
+                          <td style={{ color: '#1f2937', padding: '12px' }}>
                             <strong>{log.user ? (log.user.name || log.user.full_name) : (log.user_id ? `User #${log.user_id}` : 'Système')}</strong>
                           </td>
-                          <td>
+                          <td style={{ padding: '12px' }}>
                             <span
                               style={{
                                 padding: '3px 10px',
-                                borderRadius: '9999px',
+                                borderRadius: '4px',
                                 fontSize: '11px',
-                                fontWeight: 700,
-                                backgroundColor: isPwdChange
-                                  ? 'hsla(48, 19%, 95%, 1.00)'
-                                  : log.action?.includes('CANCEL') || log.action?.includes('DELETE')
-                                    ? '#faf7f8ff'
-                                    : log.action?.includes('CREATE') || log.action?.includes('SALE')
-                                      ? '#b5d0bfff'
-                                      : '#c8deeaff',
-                                color: '#ffffff',
+                                fontWeight: 600,
+                                backgroundColor: '#f3f4f6',
+                                color: '#1f2937',
                                 display: 'inline-block',
+                                border: '1px solid #d1d5db',
                               }}
                             >
                               {log.action === 'PASSWORD_CHANGED' ? 'MOT DE PASSE MODIFIÉ' : log.action}
                             </span>
                           </td>
-                          <td style={{ fontSize: '12px', color: isPwdChange ? '#e6e0daff' : 'var(--color-text-muted)', fontWeight: isPwdChange ? 600 : 400 }}>
+                          <td style={{ fontSize: '12px', color: '#4b5563', fontWeight: 400, padding: '12px' }}>
                             {log.description || (log.details ? (typeof log.details === 'object' ? JSON.stringify(log.details) : log.details) : '-')}
                           </td>
-                          <td style={{ fontFamily: 'monospace', fontSize: '11px', color: 'var(--color-text-dim)' }}>
+                          <td style={{ fontFamily: 'monospace', fontSize: '11px', color: '#4b5563', padding: '12px' }}>
                             {log.ip_address || '127.0.0.1'}
                           </td>
                         </tr>
