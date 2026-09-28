@@ -1,6 +1,6 @@
 """
 Database Seed Script for Jewelry POS.
-Populates standard roles, initial users, categories, luxury jewelry catalog,
+Populates standard role, initial admin user, categories, luxury jewelry catalog,
 customers, and initial stock levels.
 """
 
@@ -29,27 +29,13 @@ def seed():
     try:
         print("[INFO] Seeding database...")
 
-        # 1. Users
+        # 1. Only Admin User
         users_data = [
             {
                 "name": "admin",
                 "email": "admin@jewelrypos.com",
                 "password_hash": hash_password("admin123"),
                 "role": UserRole.ADMIN,
-                "is_active": True,
-            },
-            {
-                "name": "Claire Laurent (Gestionnaire)",
-                "email": "manager@jewelrypos.com",
-                "password_hash": hash_password("manager123"),
-                "role": UserRole.GESTIONNAIRE,
-                "is_active": True,
-            },
-            {
-                "name": "Sophie Martin (Caissière)",
-                "email": "caissier@jewelrypos.com",
-                "password_hash": hash_password("caissier123"),
-                "role": UserRole.CAISSIER,
                 "is_active": True,
             },
         ]
@@ -60,9 +46,9 @@ def seed():
                 db.add(User(**u_data))
                 print(f"  + Added user: {u_data['email']} ({u_data['role']})")
             else:
-                existing.password_hash = u_data["password_hash"]
-                existing.is_active = True
-                print(f"  ~ Updated password for user: {u_data['email']}")
+                # Nou retire lide pou l ta re-ekri sou modpas la. 
+                # Konsa, si w chanje modpas ou nan aplikasyon an, l ap rete li menm nèt!
+                print(f"  ~ User already exists: {u_data['email']} (keeping custom password)")
         db.commit()
 
         admin_user = db.query(User).filter(User.role == UserRole.ADMIN).first()
