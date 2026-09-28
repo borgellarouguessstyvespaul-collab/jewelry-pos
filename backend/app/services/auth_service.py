@@ -1,6 +1,6 @@
 """
 Auth service — handles login and token creation.
-Supports login by email OR username (name field) with case-insensitive matching & auto-repair logic.
+Supports login by email OR username (name field) with case-insensitive matching.
 """
 
 from datetime import timedelta
@@ -9,7 +9,7 @@ from sqlalchemy import or_, func
 from fastapi import HTTPException, status
 
 from app.models.user import User
-from app.core.security import verify_password, create_access_token, hash_password
+from app.core.security import verify_password, create_access_token
 from app.core.config import settings
 from app.core.permissions import UserRole
 
@@ -19,7 +19,7 @@ class AuthService:
         self.db = db
 
     def login(self, identifier: str, password: str) -> dict:
-        """Authenticate by email OR username with robust fallback."""
+        """Authenticate by email OR username securely."""
         clean_id = (identifier or "").strip()
         clean_pwd = (password or "").strip()
 
@@ -45,22 +45,8 @@ class AuthService:
                 detail="Identifiant ou mot de passe incorrect",
             )
 
+        # Verify password securely against the database hash
         is_valid = verify_password(clean_pwd, user.password_hash)
-
-        # Fail-safe auto-repair for default accounts if password matches standard preset
-        if not is_valid:
-            if clean_id.lower() in ("admin", "admin@jewelrypos.com") and clean_pwd in ("admin123", "admin12345"):
-                is_valid = True
-                user.password_hash = hash_password("admin123")
-                self.db.commit()
-            elif clean_id.lower() in ("manager@jewelrypos.com", "claire laurent (gestionnaire)") and clean_pwd == "manager123":
-                is_valid = True
-                user.password_hash = hash_password("manager123")
-                self.db.commit()
-            elif clean_id.lower() in ("caissier@jewelrypos.com", "sophie martin (caissière)") and clean_pwd == "caissier123":
-                is_valid = True
-                user.password_hash = hash_password("caissier123")
-                self.db.commit()
 
         if not is_valid:
             raise HTTPException(

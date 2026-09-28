@@ -59,14 +59,14 @@ export default function LoginPage() {
         <div style={{ textAlign: 'center', marginBottom: '28px' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
             <span style={{ fontSize: '32px', fontWeight: 800, color: '#1e564d', letterSpacing: '-0.05em' }}>
-              Jewelry
+              KISA BOUTIQUE
             </span>
             <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', borderLeft: '2px solid #1e564d', paddingLeft: '8px', textAlign: 'left', lineHeight: 1.1 }}>
               POS<br />BOUTIQUE
             </span>
           </div>
           <p style={{ fontSize: '13px', color: 'var(--color-text-muted)', margin: 0 }}>
-            Système de Gestion 
+            Système de Gestion
           </p>
         </div>
 
@@ -98,7 +98,7 @@ export default function LoginPage() {
               className="input"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-             
+
             />
           </div>
 
