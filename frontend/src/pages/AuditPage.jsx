@@ -66,7 +66,7 @@ export default function AuditPage() {
     if (!window.confirm(`Voulez-vous vraiment verrouiller et valider l'audit pour ${periodeStr} ?`)) return
 
     // Isit la ou ka konekte l ak backend ou an (egz: auditService.closePeriod(...))
-    showSuccess(`Période (${periodeStr}) clôturée et verrouillée avec succès pour l'audit ! 🔒`)
+    showSuccess(`Période (${periodeStr}) clôturée et verrouillée avec succès pour l'audit ! `)
   }
 
   return (
@@ -203,12 +203,12 @@ export default function AuditPage() {
                                 fontSize: '11px',
                                 fontWeight: 700,
                                 backgroundColor: isPwdChange
-                                  ? '#ca8a04'
+                                  ? 'hsla(48, 19%, 95%, 1.00)'
                                   : log.action?.includes('CANCEL') || log.action?.includes('DELETE')
-                                    ? '#e11d48'
+                                    ? '#faf7f8ff'
                                     : log.action?.includes('CREATE') || log.action?.includes('SALE')
-                                      ? '#16a34a'
-                                      : '#0284c7',
+                                      ? '#b5d0bfff'
+                                      : '#c8deeaff',
                                 color: '#ffffff',
                                 display: 'inline-block',
                               }}
@@ -216,7 +216,7 @@ export default function AuditPage() {
                               {log.action === 'PASSWORD_CHANGED' ? 'MOT DE PASSE MODIFIÉ' : log.action}
                             </span>
                           </td>
-                          <td style={{ fontSize: '12px', color: isPwdChange ? '#854d0e' : 'var(--color-text-muted)', fontWeight: isPwdChange ? 600 : 400 }}>
+                          <td style={{ fontSize: '12px', color: isPwdChange ? '#e6e0daff' : 'var(--color-text-muted)', fontWeight: isPwdChange ? 600 : 400 }}>
                             {log.description || (log.details ? (typeof log.details === 'object' ? JSON.stringify(log.details) : log.details) : '-')}
                           </td>
                           <td style={{ fontFamily: 'monospace', fontSize: '11px', color: 'var(--color-text-dim)' }}>
