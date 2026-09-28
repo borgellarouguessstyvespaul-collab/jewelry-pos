@@ -169,7 +169,7 @@ export default function CategoriesPage() {
   }
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+    <div className="w-full overflow-x-hidden" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
       <Header
         title="Gestion des Catégories"
         subtitle="Organiser les matériels, accessoires et articles par catégorie — cliquez sur une catégorie pour voir ses produits"
@@ -229,64 +229,70 @@ export default function CategoriesPage() {
                 className="card"
                 style={{ padding: 0, overflow: 'hidden', border: '1px solid var(--color-border)' }}
               >
-                {/* Category Header Row — clickable to toggle */}
+                {/* Category Header Row — Responsive flex-col for mobile, sm:flex-row for desktop */}
                 <div
                   onClick={() => toggleExpand(cat.id)}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 sm:px-5 sm:py-3.5 cursor-pointer select-none transition-colors"
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '14px 20px',
-                    cursor: 'pointer',
                     backgroundColor: isOpen ? '#f0f9f6' : 'var(--color-surface)',
                     borderBottom: isOpen ? '1px solid var(--color-border)' : 'none',
-                    userSelect: 'none',
-                    transition: 'background-color 0.15s',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                    {/* Toggle arrow */}
-                    <span style={{ fontSize: '16px', color: '#1e564d', transition: 'transform 0.2s', display: 'inline-block', transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }}>
+                  {/* Left Info Section */}
+                  <div className="flex items-start sm:items-center gap-3 w-full sm:w-auto flex-1">
+                    <span
+                      style={{
+                        fontSize: '14px',
+                        color: '#1e564d',
+                        transition: 'transform 0.2s',
+                        display: 'inline-block',
+                        marginTop: '2px',
+                        sm: { marginTop: '0' },
+                        transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+                      }}
+                    >
                       ▶
                     </span>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: '15px', color: 'var(--color-text)' }}>
-                        {cat.name}
+                    <div className="flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span style={{ fontWeight: 700, fontSize: '15px', color: 'var(--color-text)' }}>
+                          {cat.name}
+                        </span>
+                        <span
+                          style={{
+                            padding: '2px 8px',
+                            borderRadius: '9999px',
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            backgroundColor: products.length > 0 ? '#eef5f3' : '#f3f4f6',
+                            color: products.length > 0 ? '#1e564d' : '#6b7280',
+                            border: `1px solid ${products.length > 0 ? '#cce5df' : '#e5e7eb'}`,
+                          }}
+                        >
+                          {products.length} produit{products.length !== 1 ? 's' : ''}
+                        </span>
+                        {cat.is_active ? (
+                          <span className="badge badge-success" style={{ fontSize: '11px' }}>Actif</span>
+                        ) : (
+                          <span className="badge badge-danger" style={{ fontSize: '11px' }}>Inactif</span>
+                        )}
                       </div>
                       {cat.description && (
-                        <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                        <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
                           {cat.description}
                         </div>
                       )}
                     </div>
-                    <span
-                      style={{
-                        padding: '3px 10px',
-                        borderRadius: '9999px',
-                        fontSize: '11px',
-                        fontWeight: 700,
-                        backgroundColor: products.length > 0 ? '#eef5f3' : '#f3f4f6',
-                        color: products.length > 0 ? '#1e564d' : '#6b7280',
-                        border: `1px solid ${products.length > 0 ? '#cce5df' : '#e5e7eb'}`,
-                      }}
-                    >
-                      {products.length} produit{products.length !== 1 ? 's' : ''}
-                    </span>
-                    {cat.is_active ? (
-                      <span className="badge badge-success" style={{ fontSize: '11px' }}>Actif</span>
-                    ) : (
-                      <span className="badge badge-danger" style={{ fontSize: '11px' }}>Inactif</span>
-                    )}
                   </div>
 
                   {/* Action buttons — stop propagation so clicking them doesn't toggle expand */}
                   <div
-                    style={{ display: 'flex', gap: '6px', alignItems: 'center' }}
+                    className="flex flex-wrap items-center gap-2 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <button
                       onClick={() => handleOpenAddProduct(cat)}
-                      className="btn btn-primary btn-sm"
+                      className="btn btn-primary btn-sm flex-1 sm:flex-none justify-center"
                       style={{ fontSize: '12px' }}
                       title="Ajouter un produit dans cette catégorie"
                     >
@@ -294,14 +300,14 @@ export default function CategoriesPage() {
                     </button>
                     <button
                       onClick={() => handleOpenEdit(cat)}
-                      className="btn btn-secondary btn-sm"
+                      className="btn btn-secondary btn-sm flex-1 sm:flex-none justify-center"
                       style={{ fontSize: '12px' }}
                     >
                       Modifier
                     </button>
                     <button
                       onClick={() => handleDelete(cat.id)}
-                      className="btn btn-secondary btn-sm"
+                      className="btn btn-secondary btn-sm flex-1 sm:flex-none justify-center"
                       style={{ fontSize: '12px', color: 'var(--color-danger)' }}
                     >
                       Supprimer
@@ -309,7 +315,7 @@ export default function CategoriesPage() {
                   </div>
                 </div>
 
-                {/* Expandable Products Table */}
+                {/* Expandable Products Table with horizontal scroll wrapper */}
                 {isOpen && (
                   <div style={{ animation: 'fadeIn 0.2s ease' }}>
                     {products.length === 0 ? (
@@ -317,8 +323,8 @@ export default function CategoriesPage() {
                         Aucun produit dans cette catégorie. Cliquez sur "+ Produit" pour en ajouter un.
                       </div>
                     ) : (
-                      <div className="table-wrapper" style={{ margin: 0 }}>
-                        <table style={{ fontSize: '13px' }}>
+                      <div className="table-wrapper overflow-x-auto" style={{ margin: 0 }}>
+                        <table style={{ fontSize: '13px', width: '100%', minWidth: '550px' }}>
                           <thead>
                             <tr style={{ backgroundColor: '#f9fafb' }}>
                               <th>Désignation</th>

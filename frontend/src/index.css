@@ -501,8 +501,17 @@ tbody tr:last-child td {
 
 /* ── Mobile Layout ── */
 @media (max-width: 768px) {
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+  }
+
   .app-viewport {
     padding: 0;
+    display: block; /* Fixes left-shift overflow caused by justify-content: center */
+    width: 100%;
+    overflow-x: hidden;
   }
   
   .app-frame {
