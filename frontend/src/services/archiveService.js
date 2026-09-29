@@ -10,6 +10,11 @@ export const archiveService = {
     const response = await api.post('/archives/generate', params)
     return response.data
   },
+
+  clearAll: async () => {
+    const response = await api.delete('/archives/clear')
+    return response.data
+  },
 }
 
 export default archiveService

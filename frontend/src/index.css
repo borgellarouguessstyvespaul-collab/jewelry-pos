@@ -301,6 +301,12 @@ a:hover {
   border-radius: var(--radius-2xl);
 }
 
+.dashboard-charts-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
+  gap: 20px;
+}
+
 /* ── Inputs ── */
 .input {
   width: 100%;
@@ -653,8 +659,8 @@ tbody tr:last-child td {
   padding: 4px;
 }
 
-/* ── Mobile Layout ── */
-@media (max-width: 768px) {
+/* ── Tablet & Mobile Layout (iPad, Tablets, Phones < 1024px) ── */
+@media (max-width: 1024px) {
 
   html,
   body,
@@ -666,6 +672,7 @@ tbody tr:last-child td {
     position: relative;
     box-sizing: border-box;
     -webkit-overflow-scrolling: touch;
+    background-color: var(--color-bg) !important;
   }
 
   .app-viewport {
@@ -675,6 +682,7 @@ tbody tr:last-child td {
     width: 100% !important;
     min-height: 100vh !important;
     box-sizing: border-box;
+    background-color: var(--color-bg) !important;
   }
 
   .app-frame {
@@ -688,6 +696,7 @@ tbody tr:last-child td {
     display: flex !important;
     flex-direction: column !important;
     overflow: visible !important;
+    background-color: var(--color-bg) !important;
   }
 
   /* Main content takes full width dynamically */
@@ -706,18 +715,19 @@ tbody tr:last-child td {
     box-sizing: border-box;
   }
 
-  /* Sidebar becomes a slide-in drawer */
+  /* Sidebar becomes a sleek slide-in drawer on mobile & tablet */
   .app-sidebar {
     position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
-    width: 240px;
+    width: 250px;
     height: 100vh;
     border-radius: 0;
     z-index: 1000;
     transform: translateX(-100%);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25);
   }
 
   .app-sidebar.mobile-open {
@@ -727,40 +737,38 @@ tbody tr:last-child td {
   .sidebar-mobile-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(15, 23, 42, 0.6);
     z-index: 999;
-    backdrop-filter: blur(2px);
-    animation: fadeIn 0.3s ease;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s ease;
   }
 
   .sidebar-close-btn { display: block !important; }
   .sidebar-hamburger-btn { display: none !important; }
 
-  /* Header: collapse clock badge on small screens */
+  /* Header adjustments */
   .header-clock-badge span[class*="badge"] {
     display: none;
   }
 
-  /* All grids become 1 column */
-  [style*="display: grid"] {
+  /* Dashboard Charts stack cleanly to single column */
+  .dashboard-charts-grid {
     grid-template-columns: 1fr !important;
   }
 
-  /* All flex rows can wrap */
-  [style*="display: flex"]:not(.app-sidebar):not(.mobile-header-bar):not(.action-buttons-cell) {
-    flex-wrap: wrap;
-  }
-
-  /* Tables get a horizontal scroll wrapper — content won't push the page */
+  /* Tables get a smooth touch horizontal scroll wrapper without breaking text */
   .table-wrapper {
     overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch;
-    display: block;
-    width: 100%;
+    -webkit-overflow-scrolling: touch !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: var(--radius-lg);
   }
 
   table {
-    min-width: 540px; /* tables scroll internally, not the page */
+    min-width: 540px;
+    width: 100%;
   }
 
   /* Filter bars stack fully */

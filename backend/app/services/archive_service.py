@@ -25,9 +25,14 @@ class ArchiveService:
     def __init__(self, db: Session):
         self.db = db
 
+    def clear_all(self) -> dict:
+        """Supprime toutes les archives mensuelles pour remettre le compteur à 0."""
+        self.db.query(MonthlyArchive).delete()
+        self.db.commit()
+        return {"message": "Toutes les archives ont été supprimées avec succès. Compteur remis à 0."}
+
     def get_all_archives(self) -> List[dict]:
-        """Returns all monthly archives, auto-generating missing past months if needed."""
-        self.ensure_past_months_archived()
+        """Returns all monthly archives recorded in the database."""
         archives = self.db.query(MonthlyArchive).order_by(
             MonthlyArchive.year.desc(),
             MonthlyArchive.month.desc()

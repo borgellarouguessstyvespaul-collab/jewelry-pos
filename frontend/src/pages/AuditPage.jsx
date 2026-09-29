@@ -2,8 +2,11 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import Header from '../components/layout/Header'
 import auditService from '../services/auditService'
 import { formatDate } from '../utils/formatters'
+import { useAuth } from '../context/AuthContext'
 
 export default function AuditPage() {
+  const { user } = useAuth()
+  const isAdmin = user?.role === 'ADMIN'
   const [logs, setLogs] = useState([])
   const [loading, setLoading] = useState(true)
   const [actionFilter, setActionFilter] = useState('')

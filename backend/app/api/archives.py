@@ -27,6 +27,15 @@ def get_monthly_archives(
     return service.get_all_archives()
 
 
+@router.delete("/clear")
+def clear_all_archives(
+    db: Session = Depends(get_db),
+    current_user=Depends(require_role([UserRole.ADMIN])),
+):
+    service = ArchiveService(db)
+    return service.clear_all()
+
+
 @router.post("/generate", response_model=MonthlyArchiveResponse)
 def generate_monthly_archive(
     req: Optional[ArchiveGenerateRequest] = None,

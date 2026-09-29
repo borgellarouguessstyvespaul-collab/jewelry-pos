@@ -19,11 +19,14 @@ import saleService from '../services/saleService'
 import productService from '../services/productService'
 import archiveService from '../services/archiveService'
 import { formatCurrency } from '../utils/formatters'
+import { useAuth } from '../context/AuthContext'
 
 // Pie chart colors matching the screenshot
 const PIE_COLORS = ['#1e564d', '#2d8a7c', '#5ec5b5', '#a2e2d8']
 
 export default function DashboardPage() {
+  const { user } = useAuth()
+  const isAdmin = user?.role === 'ADMIN'
   const [stats, setStats] = useState(null)
   const [products, setProducts] = useState([])
   const [lowStockItems, setLowStockItems] = useState([])
@@ -71,6 +74,25 @@ export default function DashboardPage() {
       setArchives(updatedArchives || [])
     } catch (err) {
       console.error('Erreur lors de l’archivage:', err)
+    } finally {
+      setArchiving(false)
+    }
+  }
+
+  const handleClearArchives = async () => {
+    if (!isAdmin) return
+    const confirmation = window.prompt("⚠️ REMISE DU COMPTEUR DES ARCHIVES À 0 (ADMIN) :\nTapez 'CONFIRMER' pour effacer TOUTES les archives mensuelles enregistrées :")
+    if (confirmation !== 'CONFIRMER') {
+      if (confirmation !== null) alert("Confirmation incorrecte. Action annulée.")
+      return
+    }
+    try {
+      setArchiving(true)
+      await archiveService.clearAll()
+      setArchives([])
+      alert("Toutes les archives ont été effacées. Le compteur est remis à 0 !")
+    } catch (err) {
+      alert(err.response?.data?.detail || "Erreur lors de la suppression des archives")
     } finally {
       setArchiving(false)
     }
@@ -326,13 +348,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Row 2: Charts (Sales Report & Most Sales) */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1.8fr) minmax(0, 1fr)',
-          gap: '20px',
-        }}
-      >
+      <div className="dashboard-charts-grid">
         {/* Left: Sales Report Area Chart */}
         <div className="card" style={{ padding: '20px' }}>
           <div
@@ -679,36 +695,61 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <button
-            onClick={handleManualArchive}
-            disabled={archiving}
-            className="btn btn-primary btn-sm"
-            style={{
-              backgroundColor: '#1e564d',
-              color: '#ffffff',
-              borderRadius: '9999px',
-              padding: '8px 18px',
-              fontWeight: 600,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              cursor: archiving ? 'not-allowed' : 'pointer',
-              opacity: archiving ? 0.7 : 1,
-            }}
-          >
-            {archiving ? (
-              <>Archivage en cours...</>
-            ) : (
-              <>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M21 8v13H3V8" />
-                  <path d="M1 3h22v5H1z" />
-                  <path d="M10 12h4" />
-                </svg>
-                Archiver le Mois En Cours
-              </>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            {isAdmin && archives.length > 0 && (
+              <button
+                type="button"
+                onClick={handleClearArchives}
+                disabled={archiving}
+                className="btn btn-sm"
+                style={{
+                  backgroundColor: '#fee2e2',
+                  color: '#dc2626',
+                  border: '1px solid #fca5a5',
+                  borderRadius: '9999px',
+                  padding: '8px 14px',
+                  fontWeight: 600,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  cursor: archiving ? 'not-allowed' : 'pointer',
+                }}
+              >
+                🗑️ Vider (Compteur 0)
+              </button>
             )}
-          </button>
+
+            <button
+              onClick={handleManualArchive}
+              disabled={archiving}
+              className="btn btn-primary btn-sm"
+              style={{
+                backgroundColor: '#1e564d',
+                color: '#ffffff',
+                borderRadius: '9999px',
+                padding: '8px 18px',
+                fontWeight: 600,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                cursor: archiving ? 'not-allowed' : 'pointer',
+                opacity: archiving ? 0.7 : 1,
+              }}
+            >
+              {archiving ? (
+                <>Archivage en cours...</>
+              ) : (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M21 8v13H3V8" />
+                    <path d="M1 3h22v5H1z" />
+                    <path d="M10 12h4" />
+                  </svg>
+                  Archiver le Mois En Cours
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
         {archives.length === 0 ? (
