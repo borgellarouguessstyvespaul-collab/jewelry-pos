@@ -36,7 +36,7 @@ export default function InventoryPage() {
   const [restockProduct, setRestockProduct] = useState(null)
   const [restockForm, setRestockForm] = useState({
     quantity: 10,
-    reason: 'Ravitaillement / Faire le plein',
+    reason: ' Faire le plein',
   })
   const [isSubmittingRestock, setIsSubmittingRestock] = useState(false)
 
@@ -129,7 +129,7 @@ export default function InventoryPage() {
     setRestockProduct(p)
     setRestockForm({
       quantity: 10,
-      reason: 'Ravitaillement / Faire le plein',
+      reason: 'Faire le plein',
     })
     setIsRestockModalOpen(true)
   }
@@ -148,7 +148,7 @@ export default function InventoryPage() {
         product_id: productId,
         movement_type: 'ENTREE',
         quantity: qtyToAdd,
-        reason: restockForm.reason || 'Ravitaillement / Faire le plein',
+        reason: restockForm.reason || ' Faire le plein',
       })
 
       // IMMEDIATELY update local state table without full page reload

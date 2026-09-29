@@ -114,7 +114,7 @@ export default function ReportsPage() {
                 <table>
                   <thead>
                     <tr>
-                      <th>Bijou</th>
+                      <th>produit</th>
                       <th>Qté Vendue</th>
                       <th style={{ textAlign: 'right' }}>Revenu</th>
                     </tr>

@@ -183,7 +183,7 @@ export default function AuditPage() {
                   gap: '6px'
                 }}
               >
-                🗑️ Vider l'Audit (Vierge)
+                 Vider l'Audit (Vierge)
               </button>
             )}
             <button

@@ -190,7 +190,7 @@ export default function SalesPage() {
                 gap: '5px'
               }}
             >
-              🗑️ Vider Tout l'Historique
+              Vider Tout l'Historique
             </button>
           ) : null
         }
@@ -267,7 +267,7 @@ export default function SalesPage() {
                         </span>
                         {isArchived && (
                           <span style={{ padding: '2px 8px', borderRadius: '9999px', fontSize: '11px', fontWeight: 700, backgroundColor: '#f3f4f6', color: '#4b5563', border: '1px solid #d1d5db' }}>
-                            Archivé 📦
+                            Archivé 
                           </span>
                         )}
                       </div>
@@ -296,7 +296,7 @@ export default function SalesPage() {
                         style={{ fontSize: '12px', color: '#e11d48', backgroundColor: '#fff1f2', border: '1px solid #fecdd3' }}
                         title="Supprimer définitivement toutes les ventes de cette journée"
                       >
-                        🗑️ Supprimer Journée
+                         Supprimer Journée
                       </button>
                     )}
                   </div>

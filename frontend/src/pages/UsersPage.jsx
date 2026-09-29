@@ -233,51 +233,51 @@ export default function UsersPage() {
                       return (a.full_name || a.name || '').localeCompare(b.full_name || b.name || '')
                     })
                     .map((u) => {
-                    const isUserAdmin = u.role === 'ADMIN'
-                    return (
-                      <tr key={u.id}>
-                        <td style={{ fontWeight: 600, color: 'var(--color-text)' }}>
-                          {u.full_name || u.name}
-                        </td>
-                        <td style={{ color: 'var(--color-text-muted)', fontSize: '13px' }}>{u.email}</td>
-                        <td>
-                          <span style={{ fontSize: '12px', fontWeight: 600, color: isUserAdmin ? '#1e564d' : u.role === 'GESTIONNAIRE' ? '#0369a1' : '#166534' }}>
-                            {isUserAdmin ? 'Administrateur' : u.role === 'GESTIONNAIRE' ? 'Gestionnaire' : 'Caissier / Vendeur'}
-                          </span>
-                        </td>
-                        <td>
-                          {u.is_active ? (
-                            <span className="badge badge-success">Actif</span>
-                          ) : (
-                            <span className="badge badge-danger">Désactivé</span>
-                          )}
-                        </td>
-                        <td style={{ color: 'var(--color-text-dim)', fontSize: '12px' }}>
-                          {formatDate(u.created_at)}
-                        </td>
-                        <td style={{ textAlign: 'right' }}>
-                          <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
-                            <button
-                              onClick={() => handleOpenEdit(u)}
-                              className="btn btn-secondary btn-sm"
-                              style={{ fontSize: '12px' }}
-                            >
-                              Modifier
-                            </button>
-                            {!isUserAdmin && (
-                              <button
-                                onClick={() => handleDelete(u)}
-                                className="btn btn-sm"
-                                style={{ color: 'var(--color-danger)', border: '1px solid #fecdd3', background: '#fff1f2', fontSize: '12px' }}
-                              >
-                                Supprimer
-                              </button>
+                      const isUserAdmin = u.role === 'ADMIN'
+                      return (
+                        <tr key={u.id}>
+                          <td style={{ fontWeight: 600, color: 'var(--color-text)' }}>
+                            {u.full_name || u.name}
+                          </td>
+                          <td style={{ color: 'var(--color-text-muted)', fontSize: '13px' }}>{u.email}</td>
+                          <td>
+                            <span style={{ fontSize: '12px', fontWeight: 600, color: isUserAdmin ? '#1e564d' : u.role === 'GESTIONNAIRE' ? '#0369a1' : '#166534' }}>
+                              {isUserAdmin ? 'Administrateur' : u.role === 'GESTIONNAIRE' ? 'Gestionnaire' : 'Caissier / Vendeur'}
+                            </span>
+                          </td>
+                          <td>
+                            {u.is_active ? (
+                              <span className="badge badge-success">Actif</span>
+                            ) : (
+                              <span className="badge badge-danger">Désactivé</span>
                             )}
-                          </div>
-                        </td>
-                      </tr>
-                    )
-                  })}
+                          </td>
+                          <td style={{ color: 'var(--color-text-dim)', fontSize: '12px' }}>
+                            {formatDate(u.created_at)}
+                          </td>
+                          <td style={{ textAlign: 'right' }}>
+                            <div className="action-buttons-cell" style={{ justifyContent: 'flex-end' }}>
+                              <button
+                                onClick={() => handleOpenEdit(u)}
+                                className="btn btn-secondary btn-sm"
+                                style={{ fontSize: '12px' }}
+                              >
+                                Modifier
+                              </button>
+                              {!isUserAdmin && (
+                                <button
+                                  onClick={() => handleDelete(u)}
+                                  className="btn btn-sm"
+                                  style={{ color: 'var(--color-danger)', border: '1px solid #fecdd3', background: '#fff1f2', fontSize: '12px' }}
+                                >
+                                  Supprimer
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
                 </tbody>
               </table>
             </div>

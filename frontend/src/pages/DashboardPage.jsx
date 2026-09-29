@@ -715,7 +715,7 @@ export default function DashboardPage() {
                   cursor: archiving ? 'not-allowed' : 'pointer',
                 }}
               >
-                🗑️ Vider (Compteur 0)
+                 Vider (Compteur 0)
               </button>
             )}
 

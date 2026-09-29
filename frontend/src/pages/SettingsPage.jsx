@@ -8,13 +8,12 @@ export default function SettingsPage() {
 
   const [storeSettings, setStoreSettings] = useState({
     storeName: 'KISA Boutique',
-    phone: '+509 3700-0000',
+    phone: '+509 40580207',
     address: 'Boutique Principale - KISA Boutique',
     receiptFooter: 'Mèsi pou vizit ou nan KISA Boutique !',
     currencySymbol: 'HTG',
     currencyName: 'HTG (Gourdes)',
     lowStockThreshold: 5,
-    taxRate: 0,
     disableBusinessHoursRestriction: false,
   })
 
@@ -39,7 +38,7 @@ export default function SettingsPage() {
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
       <Header
-        title="Paramètres du Système"
+        title="Paramètres de gestion "
         subtitle="Configuration de la boutique KISA Boutique, tickets de caisse, devise et sécurité"
       />
 
@@ -59,7 +58,7 @@ export default function SettingsPage() {
               justifyContent: 'space-between',
             }}
           >
-            <span>Les paramètres de KISA Boutique ont été enregistrés avec succès.</span>
+            <span> paramètre  enregistré avec succès.</span>
             <button
               onClick={() => setSavedSuccess(false)}
               style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#166534', fontSize: '14px' }}
@@ -72,7 +71,7 @@ export default function SettingsPage() {
         {/* Store Settings Form */}
         <div className="card" style={{ padding: '24px' }}>
           <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: '0 0 16px 0', color: 'var(--color-text)' }}>
-            Informations de la Bijouterie
+            Informations BOUTIQUE
           </h3>
 
           <form onSubmit={handleSaveSettings} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
