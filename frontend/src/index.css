@@ -657,10 +657,12 @@ tbody tr:last-child td {
 @media (max-width: 768px) {
 
   html,
-  body {
+  body,
+  #root {
     overflow-x: hidden !important;
     width: 100% !important;
     max-width: 100vw !important;
+    position: relative;
   }
 
   .app-viewport {
@@ -680,29 +682,35 @@ tbody tr:last-child td {
     width: 100%;
     max-width: 100vw;
     overflow-x: hidden !important;
+    overflow: hidden;
   }
 
-  /* Prevent horizontal scroll on the main content */
+  /* Main content takes full width */
   .app-main-content {
     max-width: 100vw !important;
     overflow-x: hidden !important;
+    overflow-y: auto;
     padding: 12px !important;
     width: 100% !important;
+    box-sizing: border-box;
   }
 
   .mobile-header-bar {
     display: flex;
   }
 
+  /* Sidebar becomes a slide-in drawer */
   .app-sidebar {
     position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
+    width: 240px;
     height: 100vh;
     border-radius: 0;
     z-index: 1000;
     transform: translateX(-100%);
+    transition: transform 0.3s ease;
   }
 
   .app-sidebar.mobile-open {
@@ -718,54 +726,82 @@ tbody tr:last-child td {
     animation: fadeIn 0.3s ease;
   }
 
-  .sidebar-close-btn {
-    display: block !important;
+  .sidebar-close-btn { display: block !important; }
+  .sidebar-hamburger-btn { display: none !important; }
+
+  /* Header: collapse clock badge on small screens */
+  .header-clock-badge span[class*="badge"] {
+    display: none;
   }
 
-  .sidebar-hamburger-btn {
-    display: none !important;
-  }
-
-  /* Force structural grids to stack on mobile */
+  /* All grids become 1 column */
   [style*="display: grid"] {
     grid-template-columns: 1fr !important;
   }
 
-  /* Force top headers to wrap */
-  .app-main-content>div>[style*="display: flex"] {
-    flex-wrap: wrap !important;
+  /* All flex rows can wrap */
+  [style*="display: flex"]:not(.app-sidebar):not(.mobile-header-bar):not(.action-buttons-cell) {
+    flex-wrap: wrap;
   }
 
-  /* Overrides for filter wrappers to stack on mobile */
+  /* Tables get a horizontal scroll wrapper — content won't push the page */
+  .table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    display: block;
+    width: 100%;
+  }
+
+  table {
+    min-width: 540px; /* tables scroll internally, not the page */
+  }
+
+  /* Filter bars stack fully */
   .filter-input-wrapper,
   .filter-select-wrapper,
-  .filter-select-wrapper-sm,
-  .search-pill-input {
+  .filter-select-wrapper-sm {
     flex: 1 1 100% !important;
     min-width: 0 !important;
     width: 100% !important;
   }
 
+  /* Action buttons can wrap */
   .action-buttons-cell {
     flex-wrap: wrap !important;
+    justify-content: flex-end;
+    gap: 4px;
   }
 
-  /* Specific fix for POS Page side-by-side view */
+  /* POS Page: stacks vertically */
   .pos-layout-row {
     flex-direction: column !important;
+    height: auto !important;
   }
 
   .pos-cart-panel {
     width: 100% !important;
-    height: 400px !important;
+    height: 380px !important;
+    min-height: 380px;
   }
 
-  /* Make modals responsive */
+  /* Modals adapt to screen */
+  .modal-overlay {
+    padding: 12px;
+    align-items: flex-end;
+  }
+
   .modal-box {
-    width: 95% !important;
+    width: 100% !important;
+    max-width: 100% !important;
     padding: 20px 16px !important;
-    margin: 10px;
-    max-height: 90vh;
+    margin: 0;
+    border-radius: 20px 20px 0 0;
+    max-height: 92vh;
     overflow-y: auto;
+  }
+
+  /* Charts: ensure they don't overflow */
+  .recharts-wrapper {
+    width: 100% !important;
   }
 }

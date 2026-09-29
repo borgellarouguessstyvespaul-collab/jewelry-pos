@@ -145,10 +145,8 @@ export default function DashboardPage() {
   }
 
   // Display values with real data from stats
-  const totalSalesVal = stats?.today_sales_total || 0
-  const totalPurchasesVal = stats?.total_sales_month || 0
-  const totalPaidVal = stats?.total_paid_today || 0
-  const profitsVal = stats?.profits_today || 0
+  const weeklySalesVal = stats?.total_sales_week || stats?.total_sales_month || 0
+  const profitsVal = stats?.profits_today || stats?.profits_week || 0
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
@@ -179,7 +177,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Row 1: 4 Metric Cards */}
+      {/* Row 1: 2 Metric Cards */}
       <div
         style={{
           display: 'grid',
@@ -187,7 +185,7 @@ export default function DashboardPage() {
           gap: '16px',
         }}
       >
-        {/* Card 1: Total Sales */}
+        {/* Card 1: Ventes de la Semaine */}
         <div
           className="card-tinted"
           style={{
@@ -203,7 +201,7 @@ export default function DashboardPage() {
                 width: '42px',
                 height: '42px',
                 borderRadius: '10px',
-                backgroundColor: 'var(--color-bronze)',
+                backgroundColor: 'var(--color-primary)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -219,98 +217,16 @@ export default function DashboardPage() {
             </div>
             <div>
               <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 500 }}>
-                Total Sales
+                Ventes de la Semaine
               </span>
               <div style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--color-text)', letterSpacing: '-0.02em', marginTop: '2px' }}>
-                {formatCurrency(totalSalesVal)}
+                {formatCurrency(weeklySalesVal)}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Card 2: Total Purchases */}
-        <div
-          className="card-tinted"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            gap: '12px',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
-            <div
-              style={{
-                width: '42px',
-                height: '42px',
-                borderRadius: '10px',
-                backgroundColor: 'var(--color-ocean)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#ffffff',
-                flexShrink: 0,
-              }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="8" cy="21" r="1" />
-                <circle cx="19" cy="21" r="1" />
-                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
-              </svg>
-            </div>
-            <div>
-              <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 500 }}>
-                Total Purchases
-              </span>
-              <div style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--color-text)', letterSpacing: '-0.02em', marginTop: '2px' }}>
-                {formatCurrency(totalPurchasesVal)}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 3: Total Paid */}
-        <div
-          className="card-tinted"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            gap: '12px',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
-            <div
-              style={{
-                width: '42px',
-                height: '42px',
-                borderRadius: '10px',
-                backgroundColor: 'var(--color-royal)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#ffffff',
-                flexShrink: 0,
-              }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="5" width="20" height="14" rx="2" />
-                <line x1="2" y1="10" x2="22" y2="10" />
-                <path d="m9 15 2 2 4-4" />
-              </svg>
-            </div>
-            <div>
-              <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 500 }}>
-                Total Paid
-              </span>
-              <div style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--color-text)', letterSpacing: '-0.02em', marginTop: '2px' }}>
-                {formatCurrency(totalPaidVal)}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 4: Profits */}
+        {/* Card 2: Profits */}
         <div
           className="card-tinted"
           style={{

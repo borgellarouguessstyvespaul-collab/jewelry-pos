@@ -222,7 +222,16 @@ export default function UsersPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((u) => {
+                  {[...users]
+                    .sort((a, b) => {
+                      // Sort: ADMIN first, then GESTIONNAIRE, then CAISSIER, then by name
+                      const roleOrder = { ADMIN: 0, GESTIONNAIRE: 1, CAISSIER: 2 }
+                      const roleA = roleOrder[a.role] ?? 3
+                      const roleB = roleOrder[b.role] ?? 3
+                      if (roleA !== roleB) return roleA - roleB
+                      return (a.full_name || a.name || '').localeCompare(b.full_name || b.name || '')
+                    })
+                    .map((u) => {
                     const isUserAdmin = u.role === 'ADMIN'
                     return (
                       <tr key={u.id}>
@@ -231,18 +240,8 @@ export default function UsersPage() {
                         </td>
                         <td style={{ color: 'var(--color-text-muted)', fontSize: '13px' }}>{u.email}</td>
                         <td>
-                          <span
-                            style={{
-                              padding: '3px 10px',
-                              borderRadius: '9999px',
-                              fontSize: '11px',
-                              fontWeight: 700,
-                              backgroundColor: isUserAdmin ? '#1e564d' : u.role === 'GESTIONNAIRE' ? '#0284c7' : '#16a34a',
-                              color: '#ffffff',
-                              display: 'inline-block',
-                            }}
-                          >
-                            {isUserAdmin ? 'Admin' : u.role === 'GESTIONNAIRE' ? 'Gestionnaire' : 'Caissier / Vendeur'}
+                          <span style={{ fontSize: '12px', fontWeight: 600, color: isUserAdmin ? '#1e564d' : u.role === 'GESTIONNAIRE' ? '#0369a1' : '#166534' }}>
+                            {isUserAdmin ? 'Administrateur' : u.role === 'GESTIONNAIRE' ? 'Gestionnaire' : 'Caissier / Vendeur'}
                           </span>
                         </td>
                         <td>
