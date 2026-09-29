@@ -19,6 +19,8 @@ class SaleItemResponse(BaseModel):
     quantity: int
     unit_price: Decimal
     subtotal: Decimal
+    cost_price: Optional[Decimal] = Decimal("0.00")
+    purchase_price: Optional[Decimal] = Decimal("0.00")
     product_name: Optional[str] = None
 
     class Config:

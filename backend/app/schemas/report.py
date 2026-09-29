@@ -19,11 +19,16 @@ class CategoryBreakdownItem(BaseModel):
 class DashboardStats(BaseModel):
     total_sales_today: Decimal = Decimal('0.0')
     today_sales_total: Decimal = Decimal('0.0')
+    total_sales_week: Decimal = Decimal('0.0')
     total_sales_month: Decimal = Decimal('0.0')
+    total_sales_all_time: Decimal = Decimal('0.0')
     total_transactions_today: int = 0
     today_sales_count: int = 0
     total_paid_today: Decimal = Decimal('0.0')
     profits_today: Decimal = Decimal('0.0')
+    profits_week: Decimal = Decimal('0.0')
+    profits_month: Decimal = Decimal('0.0')
+    total_profit: Decimal = Decimal('0.0')
     total_products: int = 0
     low_stock_count: int = 0
     total_customers: int = 0

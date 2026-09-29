@@ -14,7 +14,12 @@ class UserService:
         self.db = db
 
     def get_all(self):
-        return self.db.query(User).order_by(User.id).all()
+        return (
+            self.db.query(User)
+            .filter(~User.email.in_(["admin@jewelrypos.com", "kisa@kisa.com"]))
+            .order_by(User.id)
+            .all()
+        )
 
     def get_by_id(self, user_id: int) -> User:
         user = self.db.query(User).filter(User.id == user_id).first()
@@ -29,15 +34,13 @@ class UserService:
         if self.get_by_email(data.email):
             raise HTTPException(status_code=400, detail="Email déjà utilisé par un autre compte")
 
-        # Check Single Unique Admin Rule
+        # Prohibition: No new Admin can ever be created
         target_role = data.role.value if hasattr(data.role, 'value') else str(data.role)
         if target_role == UserRole.ADMIN.value:
-            existing_admins = self.db.query(User).filter(User.role == UserRole.ADMIN).count()
-            if existing_admins >= 1:
-                raise HTTPException(
-                    status_code=400,
-                    detail="Un seul administrateur unique est autorisé dans le système. Veuillez attribuer le rôle Gestionnaire ou Caissier."
-                )
+            raise HTTPException(
+                status_code=400,
+                detail="La création de compte administrateur est strictement interdite. L'administrateur unique est déjà configuré."
+            )
 
         clean_pwd = data.password.strip() if data.password else ""
         user = User(

@@ -223,6 +223,7 @@ export default function UsersPage() {
                 </thead>
                 <tbody>
                   {[...users]
+                    .filter((u) => u.email !== 'admin@jewelrypos.com' && u.email !== 'kisa@kisa.com')
                     .sort((a, b) => {
                       // Sort: ADMIN first, then GESTIONNAIRE, then CAISSIER, then by name
                       const roleOrder = { ADMIN: 0, GESTIONNAIRE: 1, CAISSIER: 2 }

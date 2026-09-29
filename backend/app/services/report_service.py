@@ -2,7 +2,7 @@
 
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from decimal import Decimal
 
 from app.models.sale import Sale, SaleStatus
@@ -21,35 +21,79 @@ class ReportService:
 
     def get_dashboard_stats(self) -> dict:
         today = date.today()
+        seven_days_ago = datetime.utcnow() - timedelta(days=7)
 
+        # 1. Today
         total_today = self.db.query(func.sum(Sale.total)).filter(
             func.date(Sale.created_at) == today,
             Sale.status == SaleStatus.COMPLETED
         ).scalar() or Decimal("0")
 
-        total_month = self.db.query(func.sum(Sale.total)).filter(
-            func.extract("month", Sale.created_at) == today.month,
-            func.extract("year", Sale.created_at) == today.year,
-            Sale.status == SaleStatus.COMPLETED
-        ).scalar() or Decimal("0")
-
-        tx_today = self.db.query(func.count(Sale.id)).filter(
-            func.date(Sale.created_at) == today,
-            Sale.status == SaleStatus.COMPLETED
-        ).scalar() or 0
-
-        # Calculate estimated profit for today (Sales total minus purchase cost)
-        total_cost_today = self.db.query(func.sum(Product.purchase_price * SaleItem.quantity)).select_from(
+        total_cost_today = self.db.query(func.sum(func.coalesce(Product.purchase_price, 0) * SaleItem.quantity)).select_from(
             SaleItem
         ).join(
             Sale, SaleItem.sale_id == Sale.id
-        ).join(
+        ).outerjoin(
             Product, SaleItem.product_id == Product.id
         ).filter(
             func.date(Sale.created_at) == today,
             Sale.status == SaleStatus.COMPLETED
         ).scalar() or Decimal("0")
         profits_today = max(Decimal("0"), total_today - total_cost_today)
+
+        # 2. Week (Last 7 Days)
+        total_sales_week = self.db.query(func.sum(Sale.total)).filter(
+            Sale.created_at >= seven_days_ago,
+            Sale.status == SaleStatus.COMPLETED
+        ).scalar() or Decimal("0")
+
+        total_cost_week = self.db.query(func.sum(func.coalesce(Product.purchase_price, 0) * SaleItem.quantity)).select_from(
+            SaleItem
+        ).join(
+            Sale, SaleItem.sale_id == Sale.id
+        ).outerjoin(
+            Product, SaleItem.product_id == Product.id
+        ).filter(
+            Sale.created_at >= seven_days_ago,
+            Sale.status == SaleStatus.COMPLETED
+        ).scalar() or Decimal("0")
+        profits_week = max(Decimal("0"), total_sales_week - total_cost_week)
+
+        # 3. Month
+        total_month = self.db.query(func.sum(Sale.total)).filter(
+            func.extract("month", Sale.created_at) == today.month,
+            func.extract("year", Sale.created_at) == today.year,
+            Sale.status == SaleStatus.COMPLETED
+        ).scalar() or Decimal("0")
+
+        total_cost_month = self.db.query(func.sum(func.coalesce(Product.purchase_price, 0) * SaleItem.quantity)).select_from(
+            SaleItem
+        ).join(
+            Sale, SaleItem.sale_id == Sale.id
+        ).outerjoin(
+            Product, SaleItem.product_id == Product.id
+        ).filter(
+            func.extract("month", Sale.created_at) == today.month,
+            func.extract("year", Sale.created_at) == today.year,
+            Sale.status == SaleStatus.COMPLETED
+        ).scalar() or Decimal("0")
+        profits_month = max(Decimal("0"), total_month - total_cost_month)
+
+        # 4. All-time Lifetime Totals
+        total_sales_all_time = self.db.query(func.sum(Sale.total)).filter(
+            Sale.status == SaleStatus.COMPLETED
+        ).scalar() or Decimal("0")
+
+        total_cost_all_time = self.db.query(func.sum(func.coalesce(Product.purchase_price, 0) * SaleItem.quantity)).select_from(
+            SaleItem
+        ).join(
+            Sale, SaleItem.sale_id == Sale.id
+        ).outerjoin(
+            Product, SaleItem.product_id == Product.id
+        ).filter(
+            Sale.status == SaleStatus.COMPLETED
+        ).scalar() or Decimal("0")
+        total_profit = max(Decimal("0"), total_sales_all_time - total_cost_all_time)
 
         total_products = self.db.query(func.count(Product.id)).filter(Product.is_active == True).scalar() or 0
 
@@ -91,11 +135,16 @@ class ReportService:
         return {
             "total_sales_today": total_today,
             "today_sales_total": total_today,
+            "total_sales_week": total_sales_week,
             "total_sales_month": total_month,
+            "total_sales_all_time": total_sales_all_time,
             "total_transactions_today": tx_today,
             "today_sales_count": tx_today,
             "total_paid_today": total_today,
             "profits_today": profits_today,
+            "profits_week": profits_week,
+            "profits_month": profits_month,
+            "total_profit": total_profit,
             "total_products": total_products,
             "low_stock_count": low_stock,
             "total_customers": total_customers,

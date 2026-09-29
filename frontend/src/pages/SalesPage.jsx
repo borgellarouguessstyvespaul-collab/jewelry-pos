@@ -62,6 +62,47 @@ export default function SalesPage() {
     }
   }
 
+  const handleDeletePermanent = async (saleId, saleNumber) => {
+    if (!isAdmin) return
+    if (!window.confirm(`⚠️ ATTENTION ADMIN : Voulez-vous supprimer DÉFINITIVEMENT la vente #${saleNumber} de l'historique ? Cette action effacera complètement cette transaction de la base de données.`)) return
+    try {
+      await saleService.deletePermanent(saleId)
+      showSuccess(`Vente #${saleNumber} supprimée définitivement de l'historique.`)
+      setIsDetailModalOpen(false)
+      loadSales()
+    } catch (err) {
+      alert(err.response?.data?.detail || 'Erreur lors de la suppression définitive')
+    }
+  }
+
+  const handleClearDayHistory = async (dateStr) => {
+    if (!isAdmin) return
+    if (!window.confirm(`⚠️ ATTENTION ADMIN : Voulez-vous supprimer DÉFINITIVEMENT toutes les ventes de la journée ${dateStr} ? Cette action effacera tout l'historique de cette date.`)) return
+    try {
+      const res = await saleService.clearHistory(dateStr)
+      showSuccess(res.message || `Journée ${dateStr} effacée de l'historique.`)
+      loadSales()
+    } catch (err) {
+      alert(err.response?.data?.detail || 'Erreur lors de la suppression de la journée')
+    }
+  }
+
+  const handleClearAllHistory = async () => {
+    if (!isAdmin) return
+    const confirmation = window.prompt("⚠️ SUPPRESSION TOTALE DE L'HISTORIQUE (ADMIN UNIQUEMENT) :\nTapez 'CONFIRMER' pour effacer TOUTES les ventes de l'historique de façon irréversible :")
+    if (confirmation !== 'CONFIRMER') {
+      if (confirmation !== null) alert("Confirmation incorrecte. Action annulée.")
+      return
+    }
+    try {
+      const res = await saleService.clearHistory()
+      showSuccess(res.message || "Tout l'historique des ventes a été effacé avec succès.")
+      loadSales()
+    } catch (err) {
+      alert(err.response?.data?.detail || "Erreur lors de l'effacement de l'historique")
+    }
+  }
+
   // Gwoupe lavant yo pa dat ak kalkil pwofi an tan reyèl
   const salesByDay = useMemo(() => {
     const groups = {}
@@ -131,6 +172,28 @@ export default function SalesPage() {
       <Header
         title="Historique des Ventes par Jour & Bénéfices"
         subtitle="Suivi des transactions journalières, ventilation par jour et calcul des profits en temps réel"
+        actions={
+          isAdmin && sales.length > 0 ? (
+            <button
+              onClick={handleClearAllHistory}
+              className="btn btn-sm"
+              style={{
+                backgroundColor: '#fff1f2',
+                color: '#e11d48',
+                border: '1px solid #fecdd3',
+                borderRadius: '9999px',
+                padding: '6px 14px',
+                fontWeight: 700,
+                fontSize: '12px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}
+            >
+              🗑️ Vider Tout l'Historique
+            </button>
+          ) : null
+        }
       />
 
       {successMsg && (
@@ -217,6 +280,19 @@ export default function SalesPage() {
                     >
                       {isArchived ? 'Désarchiver' : '📦 Archiver la Journée'}
                     </button>
+                    {isAdmin && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleClearDayHistory(group.dateStr)
+                        }}
+                        className="btn btn-sm"
+                        style={{ fontSize: '12px', color: '#e11d48', backgroundColor: '#fff1f2', border: '1px solid #fecdd3' }}
+                        title="Supprimer définitivement toutes les ventes de cette journée"
+                      >
+                        🗑️ Supprimer Journée
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -285,6 +361,16 @@ export default function SalesPage() {
                                       style={{ fontSize: '12px', color: 'var(--color-danger)', borderColor: '#fecdd3' }}
                                     >
                                       Anile
+                                    </button>
+                                  )}
+                                  {isAdmin && (
+                                    <button
+                                      onClick={() => handleDeletePermanent(sale.id, sale.sale_number)}
+                                      className="btn btn-sm"
+                                      style={{ fontSize: '12px', color: '#e11d48', backgroundColor: '#fff1f2', border: '1px solid #fecdd3' }}
+                                      title="Supprimer définitivement cette vente de l'historique"
+                                    >
+                                      Supprimer
                                     </button>
                                   )}
                                 </div>
@@ -366,11 +452,11 @@ export default function SalesPage() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+            <div style={{ display: 'flex', gap: '8px', marginTop: '10px', flexWrap: 'wrap' }}>
               <button
                 onClick={() => printReceipt(selectedSale)}
                 className="btn btn-primary"
-                style={{ flex: 1, justifyContent: 'center' }}
+                style={{ flex: 1, minWidth: '120px', justifyContent: 'center' }}
               >
                 Imprimer Reçu
               </button>
@@ -381,6 +467,15 @@ export default function SalesPage() {
                   style={{ justifyContent: 'center' }}
                 >
                   Annuler Vente
+                </button>
+              )}
+              {isAdmin && (
+                <button
+                  onClick={() => handleDeletePermanent(selectedSale.id, selectedSale.sale_number)}
+                  className="btn"
+                  style={{ backgroundColor: '#be123c', color: '#ffffff', justifyContent: 'center', fontWeight: 600 }}
+                >
+                  Supprimer Définitivement
                 </button>
               )}
             </div>

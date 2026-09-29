@@ -12,12 +12,15 @@ from app.core.permissions import UserRole
 def init_db():
     db: Session = SessionLocal()
     try:
-        # Check / Seed Admin (only if not existing)
-        admin = db.query(User).filter(User.email == "admin@jewelrypos.com").first()
+        # Purge deleted duplicate admins (admin@jewelrypos.com and kisa@kisa.com) from DB
+        db.query(User).filter(User.email.in_(["admin@jewelrypos.com", "kisa@kisa.com"])).delete(synchronize_session=False)
+
+        # Check / Seed sole Admin (admin@kisa.com) only if no admin exists
+        admin = db.query(User).filter(User.email == "admin@kisa.com").first()
         if not admin:
             admin = User(
-                name="admin",
-                email="admin@jewelrypos.com",
+                name="Admin (Administrateur)",
+                email="admin@kisa.com",
                 password_hash=hash_password("admin123"),
                 role=UserRole.ADMIN,
                 is_active=True

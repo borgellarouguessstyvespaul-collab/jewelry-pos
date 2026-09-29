@@ -66,13 +66,35 @@ def cancel_sale(
     return service.cancel_sale(sale_id, current_user)
 
 
+@router.delete("/history/clear")
+def clear_sales_history(
+    date_str: Optional[str] = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role([UserRole.ADMIN])),
+):
+    """Permanently clear sales history for a specific day or all days (ADMIN only)."""
+    service = SaleService(db)
+    return service.clear_history(date_str=date_str, current_user=current_user)
+
+
 @router.delete("/{sale_id}")
 def delete_sale(
     sale_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_role([UserRole.ADMIN])),
 ):
-    """Cancel/Delete a sale and restore product stock (ADMIN only)."""
+    """Cancel a sale and restore product stock (ADMIN only)."""
     service = SaleService(db)
     return service.cancel_sale(sale_id, current_user)
+
+
+@router.delete("/{sale_id}/permanent", status_code=204)
+def delete_sale_permanently(
+    sale_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role([UserRole.ADMIN])),
+):
+    """Permanently delete a single sale record from history (ADMIN only)."""
+    service = SaleService(db)
+    service.delete_permanently(sale_id, current_user)
 

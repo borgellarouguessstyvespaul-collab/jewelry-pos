@@ -804,4 +804,64 @@ tbody tr:last-child td {
   .recharts-wrapper {
     width: 100% !important;
   }
+
+  /* iOS / Android Inputs: 16px font prevents auto-zoom on Safari iOS */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* ── iOS Safe Area Insets & Touch Optimizations ── */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .mobile-header-bar {
+    padding-top: calc(12px + env(safe-area-inset-top));
+  }
+  .app-main-content {
+    padding-bottom: calc(16px + env(safe-area-inset-bottom)) !important;
+  }
+  .pos-cart-panel {
+    padding-bottom: calc(16px + env(safe-area-inset-bottom)) !important;
+  }
+}
+
+/* ── Extra Small Screen Optimization (Android & iPhone SE / Small screens < 480px) ── */
+@media (max-width: 480px) {
+  .app-main-content {
+    padding: 8px !important;
+  }
+
+  .card {
+    padding: 14px !important;
+    border-radius: var(--radius-lg) !important;
+  }
+
+  .card-tinted {
+    padding: 14px !important;
+  }
+
+  /* Make header titles responsive */
+  h1, .header-title {
+    font-size: 1.35rem !important;
+  }
+
+  .header-actions {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  /* Touch-friendly buttons on mobile */
+  .btn {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Tables horizontal scroll indicator hint */
+  .table-wrapper {
+    box-shadow: inset -8px 0 8px -8px rgba(0, 0, 0, 0.15);
+  }
 }

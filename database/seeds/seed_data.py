@@ -29,11 +29,14 @@ def seed():
     try:
         print("[INFO] Seeding database...")
 
-        # 1. Only Admin User
+        # 1. Purge unwanted duplicate admins
+        db.query(User).filter(User.email.in_(["admin@jewelrypos.com", "kisa@kisa.com"])).delete(synchronize_session=False)
+
+        # Only Admin User
         users_data = [
             {
-                "name": "admin",
-                "email": "admin@jewelrypos.com",
+                "name": "Admin (Administrateur)",
+                "email": "admin@kisa.com",
                 "password_hash": hash_password("admin123"),
                 "role": UserRole.ADMIN,
                 "is_active": True,

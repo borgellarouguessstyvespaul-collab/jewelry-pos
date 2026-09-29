@@ -2,6 +2,7 @@
 SaleItem model — individual line items within a sale.
 """
 
+from decimal import Decimal
 from sqlalchemy import Column, Integer, Numeric, ForeignKey
 from sqlalchemy.orm import relationship
 
@@ -25,6 +26,16 @@ class SaleItem(Base):
     @property
     def product_name(self) -> str:
         return self.product.name if self.product else f"Produit #{self.product_id}"
+
+    @property
+    def cost_price(self):
+        if self.product and self.product.purchase_price is not None:
+            return self.product.purchase_price
+        return Decimal("0.00")
+
+    @property
+    def purchase_price(self):
+        return self.cost_price
 
     def __repr__(self):
         return f"<SaleItem sale={self.sale_id} product={self.product_id} qty={self.quantity}>"

@@ -144,9 +144,17 @@ export default function DashboardPage() {
     )
   }
 
-  // Display values with real data from stats
-  const weeklySalesVal = stats?.total_sales_week || stats?.total_sales_month || 0
-  const profitsVal = stats?.profits_today || stats?.profits_week || 0
+  // Display values with real data from stats - never resets to 0 unexpectedly
+  const hasWeeklySales = Number(stats?.total_sales_week || 0) > 0
+  const salesDisplayTitle = hasWeeklySales ? 'Ventes de la Semaine' : 'Ventes Totales'
+  const salesDisplayVal = hasWeeklySales
+    ? Number(stats?.total_sales_week || 0)
+    : (Number(stats?.total_sales_month || 0) || Number(stats?.total_sales_all_time || 0) || Number(stats?.today_sales_total || 0))
+
+  const profitsDisplayTitle = hasWeeklySales ? 'Bénéfices de la Semaine' : 'Bénéfices Globaux'
+  const profitsDisplayVal = hasWeeklySales
+    ? (Number(stats?.profits_week || 0) || Number(stats?.profits_today || 0) || Number(stats?.total_profit || 0))
+    : (Number(stats?.profits_month || 0) || Number(stats?.total_profit || 0) || Number(stats?.profits_today || 0))
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
@@ -185,7 +193,7 @@ export default function DashboardPage() {
           gap: '16px',
         }}
       >
-        {/* Card 1: Ventes de la Semaine */}
+        {/* Card 1: Ventes */}
         <div
           className="card-tinted"
           style={{
@@ -217,10 +225,10 @@ export default function DashboardPage() {
             </div>
             <div>
               <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 500 }}>
-                Ventes de la Semaine
+                {salesDisplayTitle}
               </span>
               <div style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--color-text)', letterSpacing: '-0.02em', marginTop: '2px' }}>
-                {formatCurrency(weeklySalesVal)}
+                {formatCurrency(salesDisplayVal)}
               </div>
             </div>
           </div>
@@ -257,10 +265,10 @@ export default function DashboardPage() {
             </div>
             <div>
               <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 500 }}>
-                Profits
+                {profitsDisplayTitle}
               </span>
               <div style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--color-text)', letterSpacing: '-0.02em', marginTop: '2px' }}>
-                {formatCurrency(profitsVal)}
+                {formatCurrency(profitsDisplayVal)}
               </div>
             </div>
           </div>

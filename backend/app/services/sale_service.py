@@ -15,6 +15,7 @@ Workflow:
 """
 
 from decimal import Decimal
+from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload
 from fastapi import HTTPException, status
 
@@ -171,3 +172,40 @@ class SaleService:
         self.db.commit()
         self.db.refresh(sale)
         return sale
+
+    def delete_permanently(self, sale_id: int, current_user) -> None:
+        sale = self.get_by_id(sale_id)
+        sale_number = sale.sale_number
+        sale_total = sale.total
+        # Delete line items first
+        self.db.query(SaleItem).filter(SaleItem.sale_id == sale_id).delete()
+        # Audit log
+        AuditService(self.db).log(
+            user_id=current_user.id,
+            action="SALE_DELETED_PERMANENT",
+            entity="Sale",
+            entity_id=sale_id,
+            description=f"Vente {sale_number} (Total: {sale_total} HTG) supprimée définitivement de l'historique par l'Administrateur {current_user.name}.",
+        )
+        self.db.delete(sale)
+        self.db.commit()
+
+    def clear_history(self, date_str: str = None, current_user = None) -> dict:
+        query = self.db.query(Sale)
+        if date_str:
+            query = query.filter(func.date(Sale.created_at) == date_str)
+        sales_to_delete = query.all()
+        count = len(sales_to_delete)
+        for s in sales_to_delete:
+            self.db.query(SaleItem).filter(SaleItem.sale_id == s.id).delete()
+            self.db.delete(s)
+
+        AuditService(self.db).log(
+            user_id=current_user.id if current_user else 1,
+            action="SALES_HISTORY_CLEARED",
+            entity="Sale",
+            entity_id=0,
+            description=f"Historique des ventes {'pour la journée ' + date_str if date_str else 'complet'} ({count} vente(s)) supprimé définitivement par l'Administrateur.",
+        )
+        self.db.commit()
+        return {"deleted_count": count, "message": f"{count} vente(s) supprimée(s) définitivement"}
