@@ -4,7 +4,7 @@ const getApiBaseUrl = () => {
     if (import.meta.env.DEV) {
       return 'http://localhost:8080/api'
     }
-    url = 'https://jewelry-pos-sfji.onrender.com/api'
+    url = 'https://jewelry-pos-740f.onrender.com/api'
   }
   url = url.trim().replace(/\/+$/, '')
   if (!url.endsWith('/api')) {

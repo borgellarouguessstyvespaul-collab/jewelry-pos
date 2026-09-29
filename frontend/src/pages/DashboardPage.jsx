@@ -33,6 +33,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [timeFilter, setTimeFilter] = useState('today')
   const [pieFilter, setPieFilter] = useState('today')
+  const [metricsPeriod, setMetricsPeriod] = useState('week')
   const navigate = useNavigate()
 
   const loadDashboard = async () => {
@@ -145,8 +146,6 @@ export default function DashboardPage() {
   }
 
   // Period switcher for Sales & Profits: 'day' | 'week' | 'month'
-  const [metricsPeriod, setMetricsPeriod] = useState('week')
-
   let currentSalesVal = 0
   let currentProfitsVal = 0
   let currentSalesLabel = ''

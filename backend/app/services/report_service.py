@@ -21,12 +21,15 @@ class ReportService:
 
     def get_dashboard_stats(self) -> dict:
         today = date.today()
-        today_str = today.strftime("%Y-%m-%d")
+        start_of_today = datetime.combine(today, datetime.min.time())
+        end_of_today = datetime.combine(today + timedelta(days=1), datetime.min.time())
         seven_days_ago = datetime.utcnow() - timedelta(days=7)
+        start_of_month = datetime(today.year, today.month, 1)
 
         # 1. Today
         total_today = self.db.query(func.sum(Sale.total)).filter(
-            func.date(Sale.created_at) == today_str,
+            Sale.created_at >= start_of_today,
+            Sale.created_at < end_of_today,
             Sale.status == SaleStatus.COMPLETED
         ).scalar() or Decimal("0")
 
@@ -37,10 +40,17 @@ class ReportService:
         ).outerjoin(
             Product, SaleItem.product_id == Product.id
         ).filter(
-            func.date(Sale.created_at) == today_str,
+            Sale.created_at >= start_of_today,
+            Sale.created_at < end_of_today,
             Sale.status == SaleStatus.COMPLETED
         ).scalar() or Decimal("0")
         profits_today = max(Decimal("0"), total_today - total_cost_today)
+
+        tx_today = self.db.query(func.count(Sale.id)).filter(
+            Sale.created_at >= start_of_today,
+            Sale.created_at < end_of_today,
+            Sale.status == SaleStatus.COMPLETED
+        ).scalar() or 0
 
         # 2. Week (Last 7 Days)
         total_sales_week = self.db.query(func.sum(Sale.total)).filter(
@@ -62,8 +72,7 @@ class ReportService:
 
         # 3. Month
         total_month = self.db.query(func.sum(Sale.total)).filter(
-            func.extract("month", Sale.created_at) == today.month,
-            func.extract("year", Sale.created_at) == today.year,
+            Sale.created_at >= start_of_month,
             Sale.status == SaleStatus.COMPLETED
         ).scalar() or Decimal("0")
 
@@ -74,8 +83,7 @@ class ReportService:
         ).outerjoin(
             Product, SaleItem.product_id == Product.id
         ).filter(
-            func.extract("month", Sale.created_at) == today.month,
-            func.extract("year", Sale.created_at) == today.year,
+            Sale.created_at >= start_of_month,
             Sale.status == SaleStatus.COMPLETED
         ).scalar() or Decimal("0")
         profits_month = max(Decimal("0"), total_month - total_cost_month)
@@ -109,9 +117,15 @@ class ReportService:
         # Real Monthly Trend for current year (Jan..Dec) starting from real data (0 if no sales)
         monthly_trend = []
         for m_idx in range(1, 13):
+            m_start = datetime(today.year, m_idx, 1)
+            if m_idx == 12:
+                m_end = datetime(today.year + 1, 1, 1)
+            else:
+                m_end = datetime(today.year, m_idx + 1, 1)
+
             m_sum = self.db.query(func.sum(Sale.total)).filter(
-                func.extract("month", Sale.created_at) == m_idx,
-                func.extract("year", Sale.created_at) == today.year,
+                Sale.created_at >= m_start,
+                Sale.created_at < m_end,
                 Sale.status == SaleStatus.COMPLETED
             ).scalar() or Decimal("0")
             monthly_trend.append({

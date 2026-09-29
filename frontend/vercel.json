@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://jewelry-pos-sfji.onrender.com/api/:path*"
+      "destination": "https://jewelry-pos-740f.onrender.com/api/:path*"
     },
     {
       "source": "/(.*)",
