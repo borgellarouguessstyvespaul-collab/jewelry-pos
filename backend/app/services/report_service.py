@@ -21,11 +21,12 @@ class ReportService:
 
     def get_dashboard_stats(self) -> dict:
         today = date.today()
+        today_str = today.strftime("%Y-%m-%d")
         seven_days_ago = datetime.utcnow() - timedelta(days=7)
 
         # 1. Today
         total_today = self.db.query(func.sum(Sale.total)).filter(
-            func.date(Sale.created_at) == today,
+            func.date(Sale.created_at) == today_str,
             Sale.status == SaleStatus.COMPLETED
         ).scalar() or Decimal("0")
 
@@ -36,7 +37,7 @@ class ReportService:
         ).outerjoin(
             Product, SaleItem.product_id == Product.id
         ).filter(
-            func.date(Sale.created_at) == today,
+            func.date(Sale.created_at) == today_str,
             Sale.status == SaleStatus.COMPLETED
         ).scalar() or Decimal("0")
         profits_today = max(Decimal("0"), total_today - total_cost_today)

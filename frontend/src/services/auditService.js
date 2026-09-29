@@ -10,6 +10,11 @@ export const auditService = {
     const response = await api.get(`/audit/${id}`)
     return response.data
   },
+
+  clearAll: async () => {
+    const response = await api.delete('/audit/clear')
+    return response.data
+  },
 }
 
 export default auditService

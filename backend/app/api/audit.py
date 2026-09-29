@@ -30,6 +30,16 @@ def get_audit_logs(
     return service.get_logs(skip=skip, limit=limit, action=action, user_id=user_id)
 
 
+@router.delete("/clear")
+def clear_audit_logs(
+    db: Session = Depends(get_db),
+    current_user=Depends(require_role([UserRole.ADMIN])),
+):
+    """Clear all audit log entries to reset system to virgin state (ADMIN only)."""
+    service = AuditService(db)
+    return service.clear_all()
+
+
 @router.get("/{log_id}", response_model=AuditLogResponse)
 def get_audit_log(
     log_id: int,

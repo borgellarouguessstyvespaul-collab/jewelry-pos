@@ -1,6 +1,6 @@
 """Audit service — record system actions for accountability."""
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import Optional
 
 from app.models.audit_log import AuditLog
@@ -32,8 +32,8 @@ class AuditService:
         # Note: caller is responsible for commit
         return entry
 
-    def get_logs(self, skip=0, limit=100, action=None, user_id=None):
-        query = self.db.query(AuditLog)
+    def get_logs(self, skip=0, limit=200, action=None, user_id=None):
+        query = self.db.query(AuditLog).options(joinedload(AuditLog.user))
         if action:
             query = query.filter(AuditLog.action == action)
         if user_id:
@@ -41,7 +41,12 @@ class AuditService:
         return query.order_by(AuditLog.created_at.desc()).offset(skip).limit(limit).all()
 
     def get_by_id(self, log_id: int) -> AuditLog:
-        log = self.db.query(AuditLog).filter(AuditLog.id == log_id).first()
+        log = self.db.query(AuditLog).options(joinedload(AuditLog.user)).filter(AuditLog.id == log_id).first()
         if not log:
             raise HTTPException(status_code=404, detail="Audit log not found")
         return log
+
+    def clear_all(self) -> dict:
+        count = self.db.query(AuditLog).delete()
+        self.db.commit()
+        return {"deleted_count": count, "message": f"{count} entrée(s) du journal d'audit effacée(s). Le système est vierge."}

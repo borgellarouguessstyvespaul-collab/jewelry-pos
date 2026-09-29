@@ -8,6 +8,7 @@ from datetime import datetime
 class AuditLogResponse(BaseModel):
     id: int
     user_id: Optional[int]
+    user_name: Optional[str] = "Admin"
     action: str
     entity: str
     entity_id: Optional[int]

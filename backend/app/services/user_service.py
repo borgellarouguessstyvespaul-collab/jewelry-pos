@@ -34,12 +34,12 @@ class UserService:
         if self.get_by_email(data.email):
             raise HTTPException(status_code=400, detail="Email déjà utilisé par un autre compte")
 
-        # Prohibition: No new Admin can ever be created
+        # Prohibition: Only Caissier accounts can be created
         target_role = data.role.value if hasattr(data.role, 'value') else str(data.role)
-        if target_role == UserRole.ADMIN.value:
+        if target_role != UserRole.CAISSIER.value:
             raise HTTPException(
                 status_code=400,
-                detail="La création de compte administrateur est strictement interdite. L'administrateur unique est déjà configuré."
+                detail="Seuls les comptes avec le rôle Caissier / Vendeur peuvent être créés."
             )
 
         clean_pwd = data.password.strip() if data.password else ""

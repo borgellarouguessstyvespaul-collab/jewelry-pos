@@ -12,7 +12,9 @@ export default function Header({ title = 'Dashboard', subtitle, actions }) {
   const [lowStockItems, setLowStockItems] = useState([])
   const [securityNotifs, setSecurityNotifs] = useState([])
   const [currentTime, setCurrentTime] = useState('')
-  const [notificationsCleared, setNotificationsCleared] = useState(false)
+  const [notificationsCleared, setNotificationsCleared] = useState(() => {
+    return localStorage.getItem('kisa_notifications_cleared') === 'true'
+  })
   const dropdownRef = useRef(null)
   const notifRef = useRef(null)
   const navigate = useNavigate()
@@ -74,7 +76,8 @@ export default function Header({ title = 'Dashboard', subtitle, actions }) {
   const hasNewNotifs = totalNotifs > 0
 
   const handleClearNotifications = (e) => {
-    e.stopPropagation()
+    if (e && e.stopPropagation) e.stopPropagation()
+    localStorage.setItem('kisa_notifications_cleared', 'true')
     setNotificationsCleared(true)
     setLowStockItems([])
     setSecurityNotifs([])
@@ -305,6 +308,29 @@ export default function Header({ title = 'Dashboard', subtitle, actions }) {
                     </>
                   )}
                 </div>
+
+                {totalNotifs > 0 && (
+                  <div style={{ padding: '8px 12px', borderTop: '1px solid var(--color-border-light)', backgroundColor: '#f8fafc', textAlign: 'center' }}>
+                    <button
+                      type="button"
+                      onClick={handleClearNotifications}
+                      style={{
+                        border: 'none',
+                        background: 'none',
+                        color: '#e11d48',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        padding: '4px 8px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      🗑️ Tout efase (Vider les notifications)
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>

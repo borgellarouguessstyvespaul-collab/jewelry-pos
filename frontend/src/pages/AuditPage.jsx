@@ -68,6 +68,22 @@ export default function AuditPage() {
     showSuccess(`Période (${periodeStr}) clôturée et verrouillée avec succès pour l'audit ! `)
   }
 
+  const handleClearAuditLogs = async () => {
+    if (!isAdmin) return
+    const confirmation = window.prompt("⚠️ EFFACER TOUT LE JOURNAL D'AUDIT (ADMIN UNIQUEMENT) :\nTapez 'CONFIRMER' pour effacer TOUTES les entrées du journal d'audit afin de laisser le système entièrement vierge :")
+    if (confirmation !== 'CONFIRMER') {
+      if (confirmation !== null) alert("Confirmation incorrecte. Action annulée.")
+      return
+    }
+    try {
+      const res = await auditService.clearAll()
+      showSuccess(res.message || "Journal d'audit vidé avec succès (Système vierge).")
+      loadLogs()
+    } catch (err) {
+      alert(err.response?.data?.detail || "Erreur lors de la suppression de l'audit")
+    }
+  }
+
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto', backgroundColor: '#ffffff' }}>
       <Header
@@ -148,7 +164,25 @@ export default function AuditPage() {
             </select>
           </div>
 
-          <div>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            {isAdmin && (
+              <button
+                onClick={handleClearAuditLogs}
+                className="btn"
+                style={{
+                  fontSize: '13px',
+                  backgroundColor: '#fff1f2',
+                  color: '#e11d48',
+                  border: '1px solid #fecdd3',
+                  fontWeight: 700,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                🗑️ Vider l'Audit (Vierge)
+              </button>
+            )}
             <button
               onClick={handleCloturePeriode}
               className="btn"
@@ -165,8 +199,8 @@ export default function AuditPage() {
               <div className="spinner"></div>
             </div>
           ) : (
-            <div className="table-wrapper">
-              <table style={{ width: '100%', backgroundColor: '#ffffff', color: '#1f2937' }}>
+            <div className="table-wrapper" style={{ overflowX: 'auto', width: '100%' }}>
+              <table style={{ width: '100%', minWidth: '700px', backgroundColor: '#ffffff', color: '#1f2937' }}>
                 <thead>
                   <tr style={{ backgroundColor: '#ffffff', borderBottom: '1px solid #e5e7eb' }}>
                     <th style={{ color: '#1f2937', padding: '12px' }}>Date & Heure</th>
@@ -191,7 +225,7 @@ export default function AuditPage() {
                             {formatDate(log.created_at)}
                           </td>
                           <td style={{ color: '#1f2937', padding: '12px' }}>
-                            <strong>{log.user ? (log.user.name || log.user.full_name) : (log.user_id ? `User #${log.user_id}` : 'Système')}</strong>
+                            <strong>{log.user_name || log.user?.name || log.user?.full_name || (log.user_id === 1 ? 'Admin Kisa' : log.user_id ? `Utilisateur #${log.user_id}` : 'Admin (Système)')}</strong>
                           </td>
                           <td style={{ padding: '12px' }}>
                             <span

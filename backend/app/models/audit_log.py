@@ -24,5 +24,11 @@ class AuditLog(Base):
     # Relationships
     user = relationship("User", back_populates="audit_logs")
 
+    @property
+    def user_name(self) -> str:
+        if self.user:
+            return self.user.name or self.user.email
+        return "Admin (Système)"
+
     def __repr__(self):
         return f"<AuditLog {self.action} on {self.entity}#{self.entity_id}>"

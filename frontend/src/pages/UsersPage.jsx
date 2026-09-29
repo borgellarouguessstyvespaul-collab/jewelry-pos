@@ -47,7 +47,7 @@ export default function UsersPage() {
 
   const handleOpenCreate = () => {
     setEditingUser(null)
-    setFormData({ email: '', full_name: '', role: 'GESTIONNAIRE', password: '' })
+    setFormData({ email: '', full_name: '', role: 'CAISSIER', password: '' })
     setIsModalOpen(true)
   }
 
@@ -323,7 +323,25 @@ export default function UsersPage() {
             <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-muted)', display: 'block', marginBottom: '4px' }}>
               Rôle Attribué *
             </label>
-            {editingUser && editingUser.role === 'ADMIN' ? (
+            {!editingUser ? (
+              <div
+                style={{
+                  padding: '10px 14px',
+                  borderRadius: '8px',
+                  backgroundColor: '#f0fdf4',
+                  color: '#166534',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  border: '1px solid #bbf7d0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <span>👤</span>
+                <span>Caissier / Vendeur (Caisse & Ventes uniquement)</span>
+              </div>
+            ) : editingUser.role === 'ADMIN' ? (
               <div
                 style={{
                   padding: '10px 14px',
@@ -343,8 +361,10 @@ export default function UsersPage() {
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
               >
-                <option value="GESTIONNAIRE">Gestionnaire (Stock, Produits, Rapports, POS)</option>
                 <option value="CAISSIER">Caissier / Vendeur (Caisse & Ventes uniquement)</option>
+                {editingUser.role === 'GESTIONNAIRE' && (
+                  <option value="GESTIONNAIRE">Gestionnaire (Stock, Produits, Rapports, POS)</option>
+                )}
               </select>
             )}
           </div>

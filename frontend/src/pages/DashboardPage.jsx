@@ -144,17 +144,31 @@ export default function DashboardPage() {
     )
   }
 
-  // Display values with real data from stats - never resets to 0 unexpectedly
-  const hasWeeklySales = Number(stats?.total_sales_week || 0) > 0
-  const salesDisplayTitle = hasWeeklySales ? 'Ventes de la Semaine' : 'Ventes Totales'
-  const salesDisplayVal = hasWeeklySales
-    ? Number(stats?.total_sales_week || 0)
-    : (Number(stats?.total_sales_month || 0) || Number(stats?.total_sales_all_time || 0) || Number(stats?.today_sales_total || 0))
+  // Period switcher for Sales & Profits: 'day' | 'week' | 'month'
+  const [metricsPeriod, setMetricsPeriod] = useState('week')
 
-  const profitsDisplayTitle = hasWeeklySales ? 'Bénéfices de la Semaine' : 'Bénéfices Globaux'
-  const profitsDisplayVal = hasWeeklySales
-    ? (Number(stats?.profits_week || 0) || Number(stats?.profits_today || 0) || Number(stats?.total_profit || 0))
-    : (Number(stats?.profits_month || 0) || Number(stats?.total_profit || 0) || Number(stats?.profits_today || 0))
+  let currentSalesVal = 0
+  let currentProfitsVal = 0
+  let currentSalesLabel = ''
+  let currentProfitsLabel = ''
+
+  if (metricsPeriod === 'day') {
+    currentSalesVal = Number(stats?.total_sales_today || stats?.today_sales_total || 0)
+    currentProfitsVal = Number(stats?.profits_today || 0)
+    currentSalesLabel = "Ventes d'Aujourd'hui"
+    currentProfitsLabel = "Bénéfices d'Aujourd'hui"
+  } else if (metricsPeriod === 'month') {
+    currentSalesVal = Number(stats?.total_sales_month || 0)
+    currentProfitsVal = Number(stats?.profits_month || 0)
+    currentSalesLabel = "Ventes du Mois"
+    currentProfitsLabel = "Bénéfices du Mois"
+  } else {
+    // Default: 'week'
+    currentSalesVal = Number(stats?.total_sales_week || 0)
+    currentProfitsVal = Number(stats?.profits_week || 0)
+    currentSalesLabel = "Ventes de la Semaine"
+    currentProfitsLabel = "Bénéfices de la Semaine"
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
@@ -184,6 +198,43 @@ export default function DashboardPage() {
           </Link>
         </div>
       )}
+
+      {/* Metrics Period Selector: Jour / Semaine / Mois */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+        <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text)' }}>
+          Période des Bénéfices & Ventes :
+        </div>
+        <div style={{ display: 'inline-flex', backgroundColor: '#f1f5f9', borderRadius: '10px', padding: '3px', gap: '3px' }}>
+          {[
+            { id: 'day', label: 'Jour' },
+            { id: 'week', label: 'Semaine' },
+            { id: 'month', label: 'Mois' },
+          ].map((tab) => {
+            const isActive = metricsPeriod === tab.id
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setMetricsPeriod(tab.id)}
+                style={{
+                  padding: '6px 16px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  fontSize: '12px',
+                  fontWeight: isActive ? 700 : 500,
+                  backgroundColor: isActive ? '#1e564d' : 'transparent',
+                  color: isActive ? '#ffffff' : '#64748b',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  boxShadow: isActive ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                }}
+              >
+                {tab.label}
+              </button>
+            )
+          })}
+        </div>
+      </div>
 
       {/* Row 1: 2 Metric Cards */}
       <div
@@ -225,10 +276,10 @@ export default function DashboardPage() {
             </div>
             <div>
               <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 500 }}>
-                {salesDisplayTitle}
+                {currentSalesLabel}
               </span>
               <div style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--color-text)', letterSpacing: '-0.02em', marginTop: '2px' }}>
-                {formatCurrency(salesDisplayVal)}
+                {formatCurrency(currentSalesVal)}
               </div>
             </div>
           </div>
@@ -265,10 +316,10 @@ export default function DashboardPage() {
             </div>
             <div>
               <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 500 }}>
-                {profitsDisplayTitle}
+                {currentProfitsLabel}
               </span>
               <div style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--color-text)', letterSpacing: '-0.02em', marginTop: '2px' }}>
-                {formatCurrency(profitsDisplayVal)}
+                {formatCurrency(currentProfitsVal)}
               </div>
             </div>
           </div>
