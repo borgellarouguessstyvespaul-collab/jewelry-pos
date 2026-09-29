@@ -16,7 +16,12 @@ export function AuthProvider({ children }) {
     return null
   })
 
-  const [loading, setLoading] = useState(true)
+  // If we already have stored user data, don't keep user blocked on full-screen spinner
+  const [loading, setLoading] = useState(() => {
+    const token = localStorage.getItem('token')
+    const stored = localStorage.getItem('user')
+    return !(token && stored)
+  })
 
   useEffect(() => {
     const initAuth = async () => {
@@ -28,9 +33,12 @@ export function AuthProvider({ children }) {
           localStorage.setItem('user', JSON.stringify(userData))
         } catch (err) {
           console.error('Failed to verify token:', err)
-          localStorage.removeItem('token')
-          localStorage.removeItem('user')
-          setUser(null)
+          // Only clear session if token was rejected (401)
+          if (err.response && err.response.status === 401) {
+            localStorage.removeItem('token')
+            localStorage.removeItem('user')
+            setUser(null)
+          }
         }
       } else {
         setUser(null)
