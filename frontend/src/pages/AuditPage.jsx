@@ -114,7 +114,7 @@ export default function AuditPage() {
       <div style={{ padding: 'var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', backgroundColor: '#ffffff' }}>
         {/* Zòn Filtè yo ak Bouton Clôture */}
         <div className="card" style={{ padding: 'var(--space-4)', display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', flex: 1 }}>
+          <div className="audit-filters-row" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', flex: 1 }}>
             <select
               className="input"
               value={actionFilter}

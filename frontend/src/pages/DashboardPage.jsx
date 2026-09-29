@@ -101,34 +101,34 @@ export default function DashboardPage() {
   // Dynamic Pie Data based on real category breakdown
   const categoryData = stats?.category_breakdown?.length > 0
     ? stats.category_breakdown.map((cat, idx) => ({
-        name: cat.name,
-        value: cat.value,
-        color: PIE_COLORS[idx % PIE_COLORS.length],
-      }))
+      name: cat.name,
+      value: cat.value,
+      color: PIE_COLORS[idx % PIE_COLORS.length],
+    }))
     : [
-        { name: 'Bagues Or', value: 40, color: '#1e564d' },
-        { name: 'Colliers', value: 25, color: '#5ec5b5' },
-        { name: 'Bracelets', value: 20, color: '#a2e2d8' },
-        { name: 'Montres Luxe', value: 15, color: '#2d8a7c' },
-      ]
+      { name: '', value: 40, color: '#1e564d' },
+      { name: '', value: 25, color: '#5ec5b5' },
+      { name: '', value: 20, color: '#a2e2d8' },
+      { name: '', value: 15, color: '#2d8a7c' },
+    ]
 
   // Sales data based on real monthly trend
   const salesReportData = stats?.monthly_trend?.length > 0
     ? stats.monthly_trend
     : [
-        { month: 'Jan', sales: 36000 },
-        { month: 'Feb', sales: 40000 },
-        { month: 'Mar', sales: 32000 },
-        { month: 'Apr', sales: 48000 },
-        { month: 'May', sales: 44000 },
-        { month: 'Jun', sales: 59000 },
-        { month: 'Jul', sales: 50640 },
-        { month: 'Aug', sales: 52000 },
-        { month: 'Sep', sales: 44000 },
-        { month: 'Oct', sales: 44000 },
-        { month: 'Nov', sales: 49000 },
-        { month: 'Dec', sales: 42000 },
-      ]
+      { month: 'Jan', sales: 36000 },
+      { month: 'Feb', sales: 40000 },
+      { month: 'Mar', sales: 32000 },
+      { month: 'Apr', sales: 48000 },
+      { month: 'May', sales: 44000 },
+      { month: 'Jun', sales: 59000 },
+      { month: 'Jul', sales: 50640 },
+      { month: 'Aug', sales: 52000 },
+      { month: 'Sep', sales: 44000 },
+      { month: 'Oct', sales: 44000 },
+      { month: 'Nov', sales: 49000 },
+      { month: 'Dec', sales: 42000 },
+    ]
 
   // Custom Tooltip for Area Chart matching the screenshot dark teal pill
   const CustomTooltip = ({ active, payload, label }) => {

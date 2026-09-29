@@ -241,8 +241,14 @@ export default function SalesPage() {
                 {/* Antèt Jounen an ak Total Ventes & Bénéfice */}
                 <div
                   onClick={() => toggleDay(group.dateStr)}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 sm:px-5 sm:py-3.5 cursor-pointer select-none transition-colors"
+                  className="sales-day-header"
                   style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    cursor: 'pointer',
+                    userSelect: 'none',
+                    padding: '14px 18px',
                     backgroundColor: isOpen ? '#f0f9f6' : 'var(--color-surface)',
                     borderBottom: isOpen ? '1px solid var(--color-border)' : 'none',
                   }}
@@ -272,13 +278,13 @@ export default function SalesPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                  <div className="sales-day-actions" onClick={(e) => e.stopPropagation()}>
                     <button
                       onClick={(e) => toggleArchiveDay(group.dateStr, e)}
                       className="btn btn-secondary btn-sm"
                       style={{ fontSize: '12px' }}
                     >
-                      {isArchived ? 'Désarchiver' : '📦 Archiver la Journée'}
+                      {isArchived ? 'Désarchiver' : ' Archiver la Journée'}
                     </button>
                     {isAdmin && (
                       <button

@@ -10,6 +10,7 @@ import categoryService from '../services/categoryService'
 import saleService from '../services/saleService'
 import { useCart } from '../context/CartContext'
 import useBarcode from '../hooks/useBarcode'
+import { formatCurrency } from '../utils/formatters'
 
 export default function PosPage() {
   const [products, setProducts] = useState([])
@@ -18,6 +19,7 @@ export default function PosPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [isCategoryOpen, setIsCategoryOpen] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [mobileTab, setMobileTab] = useState('catalog') // 'catalog' | 'cart'
 
   const [isPaymentOpen, setIsPaymentOpen] = useState(false)
   const [isReceiptOpen, setIsReceiptOpen] = useState(false)
@@ -144,28 +146,67 @@ export default function PosPage() {
 
   const selectedCategoryObj = categories.find((c) => c.id === selectedCategory)
   const categoryLabel = selectedCategoryObj ? selectedCategoryObj.name : 'Toutes les catégories'
+  const totalItemCount = items.reduce((sum, item) => sum + (item.quantity || 1), 0)
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, width: '100%' }}>
       <Header
         title="Point de Vente — Caisse"
         subtitle="Vente directe au comptoir avec lecteur code-barres et impression ticket"
       />
 
-      <div className="pos-layout-row" style={{ display: 'flex', flex: 1, minHeight: 0, gap: '16px' }}>
+      {/* Mobile Tab Switcher (Visible on screens <= 768px via media query) */}
+      <div
+        className="pos-mobile-tab-bar"
+        style={{
+          display: 'none',
+          gap: '8px',
+          marginBottom: '12px',
+          width: '100%',
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => setMobileTab('catalog')}
+          className={`btn ${mobileTab === 'catalog' ? 'btn-primary' : 'btn-secondary'}`}
+          style={{ flex: 1, padding: '8px 12px' }}
+        >
+          Articles ({filteredProducts.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobileTab('cart')}
+          className={`btn ${mobileTab === 'cart' ? 'btn-primary' : 'btn-secondary'}`}
+          style={{ flex: 1, padding: '8px 12px' }}
+        >
+          Panier ({totalItemCount}) • {formatCurrency(total)}
+        </button>
+      </div>
+
+      <div className="pos-layout-row" style={{ display: 'flex', flex: 1, minHeight: 0, gap: '16px', width: '100%' }}>
         {/* Left: Products Catalog & Search */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, padding: 'var(--space-4)', overflowY: 'hidden' }}>
+        <div
+          className={`pos-catalog-panel ${mobileTab === 'cart' ? 'hide-on-mobile' : ''}`}
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            minWidth: 0,
+            padding: 'var(--space-4)',
+            overflowY: 'hidden',
+          }}
+        >
           {/* Search bar & Collapsible Category Menu */}
-          <div style={{ display: 'flex', gap: '10px', marginBottom: 'var(--space-3)', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '10px', marginBottom: 'var(--space-3)', alignItems: 'center', flexWrap: 'wrap' }}>
             {/* Search Input */}
-            <div style={{ flex: 1, position: 'relative' }}>
+            <div style={{ flex: '1 1 200px', position: 'relative' }}>
               <input
                 type="text"
                 className="input"
                 placeholder="Rechercher un article (nom, référence, code-barres)..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                style={{ height: '42px', paddingLeft: '38px' }}
+                style={{ height: '42px', paddingLeft: '38px', width: '100%' }}
               />
               <svg
                 width="16"
@@ -196,6 +237,7 @@ export default function PosPage() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
+                  cursor: 'pointer',
                   fontWeight: 600,
                   fontSize: '12.5px',
                   whiteSpace: 'nowrap',
@@ -215,7 +257,7 @@ export default function PosPage() {
                     position: 'absolute',
                     top: '110%',
                     right: 0,
-                    width: '320px',
+                    width: 'min(320px, calc(100vw - 32px))',
                     backgroundColor: '#ffffff',
                     borderRadius: '12px',
                     border: '1px solid var(--color-border)',
@@ -258,7 +300,7 @@ export default function PosPage() {
                       <span style={{ fontSize: '11px', opacity: 0.8 }}>({products.length})</span>
                     </button>
 
-                    {/* All Categories list */}
+                    {/* Category List */}
                     {categories.map((cat) => {
                       const count = products.filter((p) => p.category_id === cat.id).length
                       const isSelected = selectedCategory === cat.id
@@ -296,7 +338,7 @@ export default function PosPage() {
             </div>
           </div>
 
-          {/* Product Cards Grid */}
+          {/* Product Cards Grid: Fluid Auto-Fit Grid */}
           <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px' }}>
             {loading ? (
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
@@ -311,8 +353,8 @@ export default function PosPage() {
               <div
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-                  gap: '14px',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(clamp(160px, 22vw, 240px), 1fr))',
+                  gap: 'clamp(10px, 1.5vw, 16px)',
                   paddingBottom: '20px',
                 }}
               >
@@ -328,8 +370,11 @@ export default function PosPage() {
           </div>
         </div>
 
-        {/* Right: Cart & Checkout */}
-        <div className="pos-cart-panel" style={{ width: '380px', height: '100%' }}>
+        {/* Right: Cart & Checkout Panel */}
+        <div
+          className={`pos-cart-panel ${mobileTab === 'catalog' ? 'hide-on-mobile' : ''}`}
+          style={{ height: '100%' }}
+        >
           <Cart
             onCheckout={() => setIsPaymentOpen(true)}
           />

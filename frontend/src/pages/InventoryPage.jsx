@@ -288,7 +288,7 @@ export default function InventoryPage() {
         )}
 
         {/* Global Filter Bar */}
-        <div className="card filter-bar" style={{ padding: '14px 18px', display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+        <div className="card filter-bar" style={{ padding: '14px 18px' }}>
           <div className="filter-input-wrapper">
             <input
               type="text"
